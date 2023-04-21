@@ -8,7 +8,7 @@ case $1 in
 	;;
 
 	"run-web")
-		basic-http-server ./web/
+		basic-http-server -a 0.0.0.0:4000 ./web/
 	;;
 
 	*)
