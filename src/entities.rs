@@ -77,7 +77,7 @@ impl Entity {
         }
     }
 
-    pub fn new_random_pather(target_pos: Vec2) -> Self {
+    pub fn new_random_pather() -> Self {
         let pos = random_outside_pos();
         let speed = Vec2::new(PATHER_SPEED, PATHER_SPEED);
         let mut path = VecDeque::new();
@@ -120,13 +120,13 @@ impl Entity {
     }
 
     fn player_tick(&mut self) {
-        if (self.pos + self.speed).x > WORLD_WIDTH
+        self.pos += if (self.pos + self.speed).x > WORLD_WIDTH
             || (self.pos + self.speed).y > WORLD_HEIGHT
             || (self.pos + self.speed).x < 0.
         {
-            self.pos = self.pos;
+            Vec2::ZERO
         } else {
-            self.pos += self.speed;
+            self.speed
         }
     }
 

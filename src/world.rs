@@ -29,8 +29,8 @@ impl World {
         for b in &mut self.ennemies {
             b.tick(Vec2::ZERO);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
-                if let Some(newHp) = self.hp.checked_sub(1) {
-                    self.hp = newHp;
+                if let Some(new_hp) = self.hp.checked_sub(1) {
+                    self.hp = new_hp;
                 } else {
                     self.hp = 3;
                 }
