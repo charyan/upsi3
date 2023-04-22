@@ -1,12 +1,16 @@
 mod achievements;
 mod entities;
 
+use achievements::Achievements;
 use macroquad::prelude::*;
+
+const TITLE_BAR_HEIGHT: f32 = 60.;
 
 enum GameState {
     Desktop,
     Game,
     DebugGame,
+    Achievements,
 }
 
 struct UIElement {
@@ -53,6 +57,17 @@ impl UIElement {
     }
 }
 
+fn window_decorations(state: &mut GameState, cross: &mut UIElement) {
+    draw_rectangle(0., 0., screen_width(), TITLE_BAR_HEIGHT, LIGHTGRAY);
+    cross.position = vec2(screen_width() - 5. - 50., 5.);
+    cross.draw();
+
+    let (mouse_x, mouse_y) = mouse_position();
+    if is_mouse_button_pressed(MouseButton::Left) && cross.collide(Vec2::new(mouse_x, mouse_y)) {
+        *state = GameState::Desktop;
+    }
+}
+
 #[macroquad::main("BasicShapes")]
 async fn main() {
     let mut wallpaper = UIElement::new(
@@ -60,16 +75,25 @@ async fn main() {
         vec2(screen_width(), screen_height()),
         include_bytes!("../assets/wallpaper.png"),
     );
+
     let icon_ung = UIElement::new(
         vec2(20., 20.),
         vec2(64., 80.),
         include_bytes!("../assets/icon_ung.png"),
     );
+
     let icon_dbg = UIElement::new(
         vec2(20., 120.),
         vec2(64., 80.),
         include_bytes!("../assets/icon_dbg.png"),
     );
+
+    let icon_ach = UIElement::new(
+        vec2(20., 220.),
+        vec2(64., 80.),
+        include_bytes!("../assets/icon_ach.png"),
+    );
+
     let mut cross = UIElement::new(
         vec2(screen_width() - 5. - 50., 5.),
         vec2(50., 50.),
@@ -83,23 +107,21 @@ async fn main() {
 
     let speed = 4.0;
 
+    let mut achievements = Achievements::new();
+
+    achievements.achievements[3].unlock();
+    achievements.achievements[5].unlock();
+
     loop {
         clear_background(WHITE);
         wallpaper.draw_dst = vec2(screen_width(), screen_height());
-
-        if is_key_pressed(KeyCode::Space) {
-            game_state = match game_state {
-                GameState::Desktop => GameState::Game,
-                GameState::Game => GameState::Desktop,
-                GameState::DebugGame => GameState::DebugGame,
-            }
-        }
 
         match game_state {
             GameState::Desktop => {
                 wallpaper.draw();
                 icon_ung.draw();
                 icon_dbg.draw();
+                icon_ach.draw();
 
                 // if root_ui().button(None, "Unglitched") {
                 //     game_state = GAME_STATE::GAME;
@@ -110,6 +132,12 @@ async fn main() {
                     && icon_ung.collide(Vec2::new(mouse_x, mouse_y))
                 {
                     game_state = GameState::Game;
+                }
+
+                if is_mouse_button_pressed(MouseButton::Left)
+                    && icon_ach.collide(Vec2::new(mouse_x, mouse_y))
+                {
+                    game_state = GameState::Achievements;
                 }
             }
 
@@ -129,20 +157,33 @@ async fn main() {
 
                 draw_circle(x, y, 15.0, BLUE);
 
-                // Window decorations
-                draw_rectangle(0., 0., screen_width(), 60., LIGHTGRAY);
-                cross.position = vec2(screen_width() - 5. - 50., 5.);
-                cross.draw();
-
-                let (mouse_x, mouse_y) = mouse_position();
-                if is_mouse_button_pressed(MouseButton::Left)
-                    && cross.collide(Vec2::new(mouse_x, mouse_y))
-                {
-                    game_state = GameState::Desktop;
-                }
+                window_decorations(&mut game_state, &mut cross);
             }
 
             GameState::DebugGame => {}
+
+            GameState::Achievements => {
+                let ach_x = 50.;
+                let mut ach_y = TITLE_BAR_HEIGHT + 10.;
+
+                let mut cl_ach = achievements.clone();
+
+                let n_ele_col = cl_ach.achievements.len() / 2;
+
+                for ach in &mut cl_ach.achievements[..n_ele_col] {
+                    ach.draw(vec2(ach_x, ach_y));
+                    ach_y += ach.texture.height() + 10. + 10.;
+                }
+
+                ach_y = TITLE_BAR_HEIGHT + 10.;
+
+                for ach in &mut cl_ach.achievements[n_ele_col..] {
+                    ach.draw(vec2(screen_width() / 2. + 25., ach_y));
+                    ach_y += ach.texture.height() + 10. + 10.;
+                }
+
+                window_decorations(&mut game_state, &mut cross);
+            }
         }
 
         next_frame().await

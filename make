@@ -7,7 +7,14 @@ case $1 in
 		cp target/wasm32-unknown-unknown/debug/upsi3.wasm ./web/
 	;;
 
-	"run-web")
+	"web-release")
+		cargo build --release --target wasm32-unknown-unknown
+		cp target/wasm32-unknown-unknown/debug/upsi3.wasm ./web/
+	;;
+
+	"run")
+		cargo build --target wasm32-unknown-unknown
+		cp target/wasm32-unknown-unknown/debug/upsi3.wasm ./web/
 		basic-http-server -a 0.0.0.0:4000 ./web/
 	;;
 
