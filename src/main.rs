@@ -9,7 +9,6 @@ use std::{f32::consts::PI, u8};
 
 use entities::{EntityType, WORLD_WIDTH};
 use macroquad::audio::stop_sound;
-use macroquad::miniquad::Texture;
 use macroquad::ui::{hash, root_ui, Skin};
 use macroquad::{
     audio::{play_sound, PlaySoundParams},
