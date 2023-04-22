@@ -1,8 +1,11 @@
-mod achievements;
-mod entities;
+pub mod achievements;
+pub mod entities;
+pub mod resources;
+pub mod world;
 
 use achievements::Achievements;
 use macroquad::prelude::*;
+use world::World;
 
 const TITLE_BAR_HEIGHT: f32 = 60.;
 
@@ -68,6 +71,7 @@ fn window_decorations(state: &mut GameState, cross: &mut UIElement) {
         *state = GameState::Desktop;
     }
 }
+fn draw_game(world: &World) {}
 
 fn draw_bsod_text(message: String) {
     let mut y = 30.;
