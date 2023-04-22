@@ -10,6 +10,8 @@ case $1 in
 	"web-release")
 		cargo build --release --target wasm32-unknown-unknown
 		cp target/wasm32-unknown-unknown/debug/upsi3.wasm ./web/
+		basic-http-server ./web/
+
 	;;
 
 	"run")

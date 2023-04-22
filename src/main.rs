@@ -287,7 +287,14 @@ impl Glitch_Effect {
     }
 }
 
-#[macroquad::main("BasicShapes")]
+fn draw_game(world: &World, resources: &Resources) {
+    let player_pos = world.player.pos;
+    let player_radius = world.player.radius;
+
+    draw_sprite(resources.player, player_pos, player_radius, screen_width());
+}
+
+#[macroquad::main("Unglitched")]
 async fn main() {
     let mut world = World::new();
 
