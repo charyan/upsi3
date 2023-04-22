@@ -9,6 +9,7 @@ use std::{f32::consts::PI, u8};
 
 use entities::{EntityType, WORLD_WIDTH};
 use macroquad::audio::stop_sound;
+use macroquad::miniquad::Texture;
 use macroquad::ui::{hash, root_ui, Skin};
 use macroquad::{
     audio::{play_sound, PlaySoundParams},
@@ -376,28 +377,45 @@ fn draw_sprite(
 struct GlitchEffect {
     count: u32,
     intensity_multiplicator: f32,
-    texture: Option<Texture2D>,
+    texture: Texture2D,
+}
+pub fn update_texture_screen_foo_bar(texture: &mut Texture2D) {
+    unsafe {
+        get_internal_gl().flush();
+        // let context = get_internal_gl().quad_context;
+        texture.grab_screen();
+    }
 }
 
 impl GlitchEffect {
     pub fn new() -> GlitchEffect {
+        let context = unsafe { get_internal_gl().quad_context };
         GlitchEffect {
             count: 0,
             intensity_multiplicator: 1.,
-            texture: None,
+            texture: Texture2D::from_miniquad_texture(miniquad::Texture::new_render_texture(
+                context,
+                miniquad::TextureParams {
+                    width: screen_width() as _,
+                    height: screen_height() as _,
+                    ..Default::default()
+                },
+            )),
         }
     }
 
     pub fn set(&mut self, count: u32, intensity_multiplicator: f32) {
         self.count = count;
         self.intensity_multiplicator = intensity_multiplicator;
-        self.texture = Some(Texture2D::from_image(&get_screen_data()));
+        self.texture = Texture2D::from_image(&get_screen_data());
     }
 
     pub fn run(&mut self) {
         if self.count > 0 {
+            update_texture_screen_foo_bar(&mut self.texture);
+
             draw_texture_ex(
-                self.texture.unwrap(),
+                self.texture,
                 rand::RandomRange::gen_range(-5., 5.) * self.intensity_multiplicator,
                 rand::RandomRange::gen_range(-5., 5.) * self.intensity_multiplicator,
                 Color {
@@ -662,7 +680,7 @@ async fn main() {
             popup.style = PopupStyle::ERROR;
         }
 
-        if is_key_pressed(KeyCode::Key3) {
+        if is_key_down(KeyCode::Key3) {
             popup.style = PopupStyle::WARNING;
             glitch_effect.set(10, 4.);
         }
