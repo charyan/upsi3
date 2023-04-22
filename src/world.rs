@@ -47,7 +47,12 @@ impl World {
         }
     }
 
-    pub fn tick(&mut self, resources: &Resources, game_state: &mut GameState) {
+    pub fn tick(
+        &mut self,
+        resources: &Resources,
+        game_state: &mut GameState,
+        bsod_message: &mut String,
+    ) {
         if self.bullet_spawn_timer > BULLET_SPAWN_TIME {
             self.bullet_spawn_timer = 0;
             self.enemies
@@ -84,7 +89,7 @@ impl World {
             self.player.speed.y -= PLAYER_SPEED;
         }
         if is_key_pressed(KeyCode::Space) {
-            self.power_destroy(&resources, game_state);
+            self.power_destroy(&resources, game_state, bsod_message);
         }
 
         self.player.speed *= 0.9;
@@ -94,14 +99,22 @@ impl World {
         for b in &mut self.enemies {
             b.tick(self.player.pos);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
-                play_sound(resources.hit_sound, PlaySoundParams::default());
+                play_sound(
+                    resources.hit_sound,
+                    PlaySoundParams {
+                        looped: false,
+                        volume: 0.5,
+                    },
+                );
                 if let Some(new_hp) = self.hp.checked_sub(1) {
                     self.hp = new_hp;
                 } else {
                     self.hp = 3;
                     if self.achievements.achievements[2].unlocked == false {
                         self.achievements.achievements[2].unlock();
+                        *bsod_message = self.achievements.achievements[2].name.to_owned();
                         *game_state = GameState::BSOD;
+                        play_sound(resources.bsod_sound, PlaySoundParams::default())
                     } else {
                         self.unstabiliy += INSTABILITY_UP;
                     }
@@ -112,14 +125,22 @@ impl World {
 
         for i in &mut self.items {
             if (i.pos - self.player.pos).length() < (self.player.radius + i.radius) {
-                play_sound(resources.picking_item_sound, PlaySoundParams::default());
+                play_sound(
+                    resources.picking_item_sound,
+                    PlaySoundParams {
+                        looped: false,
+                        volume: 0.5,
+                    },
+                );
                 match &i.e_type {
                     EntityType::HealItem => {
                         if self.hp + 1 > 3 {
                             self.hp = 0;
                             if self.achievements.achievements[3].unlocked == false {
                                 self.achievements.achievements[3].unlock();
+                                *bsod_message = self.achievements.achievements[3].name.to_owned();
                                 *game_state = GameState::BSOD;
+                                play_sound(resources.bsod_sound, PlaySoundParams::default())
                             } else {
                                 self.unstabiliy += INSTABILITY_UP;
                             }
@@ -133,7 +154,9 @@ impl World {
                             self.mana = 0;
                             if self.achievements.achievements[5].unlocked == false {
                                 self.achievements.achievements[5].unlock();
+                                *bsod_message = self.achievements.achievements[5].name.to_owned();
                                 *game_state = GameState::BSOD;
+                                play_sound(resources.bsod_sound, PlaySoundParams::default())
                             } else {
                                 self.unstabiliy += INSTABILITY_UP;
                             }
@@ -150,7 +173,9 @@ impl World {
         if self.player.pos.y < -2. {
             if self.achievements.achievements[6].unlocked == false {
                 self.achievements.achievements[6].unlock();
+                *bsod_message = self.achievements.achievements[6].name.to_owned();
                 *game_state = GameState::BSOD;
+                play_sound(resources.bsod_sound, PlaySoundParams::default())
             } else {
                 self.unstabiliy += INSTABILITY_UP;
             }
@@ -160,8 +185,19 @@ impl World {
         self.items.retain(|e| e.alive);
     }
 
-    pub fn power_destroy(&mut self, resources: &resources::Resources, game_state: &mut GameState) {
-        play_sound(resources.explosion_sound, PlaySoundParams::default());
+    pub fn power_destroy(
+        &mut self,
+        resources: &resources::Resources,
+        game_state: &mut GameState,
+        bsod_message: &mut String,
+    ) {
+        play_sound(
+            resources.explosion_sound,
+            PlaySoundParams {
+                looped: false,
+                volume: 0.5,
+            },
+        );
 
         for b in &mut self.enemies {
             if (b.pos - self.player.pos).length() < (self.player.radius + DESTROY_RANGE) {
@@ -178,7 +214,9 @@ impl World {
             }
             if self.achievements.achievements[4].unlocked == false {
                 self.achievements.achievements[4].unlock();
+                *bsod_message = self.achievements.achievements[4].name.to_owned();
                 *game_state = GameState::BSOD;
+                play_sound(resources.bsod_sound, PlaySoundParams::default())
             } else {
                 self.unstabiliy += INSTABILITY_UP;
             }

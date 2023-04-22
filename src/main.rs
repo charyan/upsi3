@@ -361,7 +361,7 @@ async fn main() {
 
     let mut game_state = GameState::Desktop;
 
-    let bsod_message = "Overflow on name input";
+    let mut bsod_message = "Overflow on name input".to_owned();
 
     // icon_dbg.visible = false;
     // icon_ach.visible = false;
@@ -403,7 +403,7 @@ async fn main() {
             }
 
             GameState::Game => {
-                world.tick(&resources, &mut game_state);
+                world.tick(&resources, &mut game_state, &mut bsod_message);
                 draw_game(&world, &resources);
 
                 if is_key_down(KeyCode::C) {
