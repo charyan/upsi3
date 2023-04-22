@@ -182,6 +182,7 @@ impl World {
                 display_bsod = true;
             } else {
                 to_raise_unstability = true;
+                self.player.pos = entities::CENTER;
             }
         }
 
@@ -242,14 +243,14 @@ impl World {
             for i in 1..amount {
                 let mut clone = duplicate.clone();
                 if y_direction < 0 {
-                    clone.pos.y -= 1. * i as f32;
+                    clone.pos.y -= 0.3 * i as f32;
                 } else {
-                    clone.pos.y += 1. * i as f32;
+                    clone.pos.y += 0.3 * i as f32;
                 }
                 if x_direction < 0 {
-                    clone.pos.x -= 1. * i as f32;
+                    clone.pos.x -= 0.3 * i as f32;
                 } else {
-                    clone.pos.x += 1. * i as f32;
+                    clone.pos.x += 0.3 * i as f32;
                 }
                 clone.is_clone = true;
 
