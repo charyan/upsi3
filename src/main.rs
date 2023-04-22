@@ -20,7 +20,6 @@ const TITLE_BAR_HEIGHT: f32 = 60.;
 pub enum GameState {
     Desktop,
     Game,
-    DebugGame,
     Achievements,
     BSOD,
 }
@@ -483,14 +482,8 @@ async fn main() {
         include_bytes!("../assets/images/icon_ung.png"),
     );
 
-    let mut icon_dbg = UIElement::new(
-        vec2(20., 120.),
-        vec2(64., 80.),
-        include_bytes!("../assets/images/icon_dbg.png"),
-    );
-
     let mut icon_ach = UIElement::new(
-        vec2(20., 220.),
+        vec2(20., 120.),
         vec2(64., 80.),
         include_bytes!("../assets/images/icon_ach.png"),
     );
@@ -504,9 +497,6 @@ async fn main() {
     let mut game_state = GameState::Desktop;
 
     let mut bsod_message = "Overflow on name input".to_owned();
-
-    // icon_dbg.visible = false;
-    // icon_ach.visible = false;
 
     let mut glitch_effect = Glitch_Effect {
         count: 0,
@@ -537,7 +527,6 @@ async fn main() {
             GameState::Desktop => {
                 wallpaper.draw();
                 icon_ung.draw();
-                icon_dbg.draw();
                 icon_ach.draw();
 
                 if !popup.visible {
@@ -554,12 +543,6 @@ async fn main() {
                         && icon_ach.collide(Vec2::new(mouse_x, mouse_y))
                     {
                         game_state = GameState::Achievements;
-                    }
-
-                    if is_mouse_button_pressed(MouseButton::Left)
-                        && icon_dbg.collide(Vec2::new(mouse_x, mouse_y))
-                    {
-                        game_state = GameState::DebugGame;
                     }
                 }
             }
@@ -606,33 +589,6 @@ async fn main() {
                 }
 
                 window_decorations(&mut game_state, &mut cross, "Unglitched");
-            }
-
-            GameState::DebugGame => {
-                let dbg_pos = vec2(screen_width() * 2. / 3., TITLE_BAR_HEIGHT);
-                let mut list_pos = vec2(dbg_pos.x + 20., dbg_pos.y + 40.);
-                let list_font_size = 40.;
-
-                draw_rectangle(
-                    dbg_pos.x,
-                    dbg_pos.y,
-                    screen_width() / 3.,
-                    screen_height() - TITLE_BAR_HEIGHT,
-                    DARKGRAY,
-                );
-
-                let debug_list = vec![
-                    format!("mouse_pos_x: {}", mouse_position().0),
-                    format!("mouse_pos_y: {}", mouse_position().1),
-                ];
-
-                for item in debug_list {
-                    draw_text(&item, list_pos.x, list_pos.y, list_font_size, WHITE);
-
-                    list_pos.y += list_font_size;
-                }
-
-                window_decorations(&mut game_state, &mut cross, "Unglitched (Debug mode)");
             }
 
             GameState::Achievements => {
