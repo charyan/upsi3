@@ -14,6 +14,7 @@ enum GameState {
     Game,
     DebugGame,
     Achievements,
+    BSOD,
 }
 
 struct UIElement {
@@ -72,6 +73,132 @@ fn window_decorations(state: &mut GameState, cross: &mut UIElement) {
 }
 fn draw_game(world: &World) {}
 
+fn draw_bsod_text(message: String) {
+    let mut y = 30.;
+    let y_diff = 30.;
+    let font_size_bsod = 30.;
+
+    draw_text(
+        "A problem has been detected and Dinwows has been shut down to prevent damage",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text("to your computer.", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text("", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text(&format!("{}", message), 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text("", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text(
+        "[PRESS ENTER TO RESTART YOUR COMPUTER]",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text("", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text(
+        "If this is the first time you've seen this error screen,",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text(
+        "restart your computer by pressing ENTER. If this sreen appears again, follow",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text("these steps:", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text("", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text(
+        "Check to make sure any new hardware or software is properly installed.",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text(
+        "If this is a new installation, ask your hardware or software manufacturer",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text(
+        "for any Dinwows updates you might need.",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text("", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text(
+        "If this problems continue, disable or remove any newly installed hardware",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text(
+        "or software. Disable BIOS memory options such as caching or shadowing.",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text(
+        "If you need to use Safe Mode to remove or disable components, restart",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text(
+        "your computer, press F8 to select Advanced Startup Options, and then",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+    y += y_diff;
+    draw_text("select Safe Mode.", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text("", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text("Technical Information:", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text("", 50., y, font_size_bsod, WHITE);
+    y += y_diff;
+    draw_text(
+        "*** STOP: 0x000000ED (0x80F128D0, 0x000009c, 0x00000000, 0x00000000)",
+        50.,
+        y,
+        font_size_bsod,
+        WHITE,
+    );
+}
+
 #[macroquad::main("BasicShapes")]
 async fn main() {
     let mut wallpaper = UIElement::new(
@@ -116,6 +243,8 @@ async fn main() {
     achievements.achievements[3].unlock();
     achievements.achievements[5].unlock();
 
+    let mut bsod_message = "Overflow on name input";
+
     loop {
         clear_background(WHITE);
         wallpaper.draw_dst = vec2(screen_width(), screen_height());
@@ -146,6 +275,10 @@ async fn main() {
             }
 
             GameState::Game => {
+                if is_key_down(KeyCode::C) {
+                    game_state = GameState::BSOD;
+                }
+
                 if is_key_down(KeyCode::D) {
                     x += speed;
                 }
@@ -187,6 +320,16 @@ async fn main() {
                 }
 
                 window_decorations(&mut game_state, &mut cross);
+            }
+
+            GameState::BSOD => {
+                draw_rectangle(0., 0., screen_width(), screen_height(), DARKBLUE);
+
+                draw_bsod_text(bsod_message.to_string());
+
+                if is_key_pressed(KeyCode::Enter) {
+                    game_state = GameState::Desktop;
+                }
             }
         }
 
