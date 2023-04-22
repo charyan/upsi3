@@ -5,6 +5,7 @@ pub mod world;
 
 use achievements::Achievements;
 use macroquad::prelude::*;
+use resources::Resources;
 use world::World;
 
 const TITLE_BAR_HEIGHT: f32 = 60.;
@@ -79,7 +80,6 @@ fn window_decorations(state: &mut GameState, cross: &mut UIElement, title: &str)
         *state = GameState::Desktop;
     }
 }
-fn draw_game(world: &World) {}
 
 fn draw_bsod_text(message: String) {
     let mut y = 30.;
@@ -207,8 +207,20 @@ fn draw_bsod_text(message: String) {
     );
 }
 
+fn draw_game(world: &World, resources: &Resources) {
+    let player_pos = world.player.pos;
+
+    println!("{} {}", player_pos.x, player_pos.y);
+
+    draw_circle(player_pos.x, player_pos.y, 15.0, BLUE);
+}
+
 #[macroquad::main("BasicShapes")]
 async fn main() {
+    let mut world = World::new();
+
+    let resources = Resources::load();
+
     let mut wallpaper = UIElement::new(
         vec2(0., 0.),
         vec2(screen_width(), screen_height()),
@@ -241,17 +253,12 @@ async fn main() {
 
     let mut game_state = GameState::Desktop;
 
-    let mut x = screen_width() / 2.0;
-    let mut y = screen_height() / 2.0;
-
-    let speed = 4.0;
-
     let mut achievements = Achievements::new();
 
     achievements.achievements[3].unlock();
     achievements.achievements[5].unlock();
 
-    let mut bsod_message = "Overflow on name input";
+    let bsod_message = "Overflow on name input";
 
     loop {
         clear_background(WHITE);
@@ -285,24 +292,12 @@ async fn main() {
             }
 
             GameState::Game => {
+                world.tick();
+                draw_game(&world, &resources);
+
                 if is_key_down(KeyCode::C) {
                     game_state = GameState::BSOD;
                 }
-
-                if is_key_down(KeyCode::D) {
-                    x += speed;
-                }
-                if is_key_down(KeyCode::A) {
-                    x -= speed;
-                }
-                if is_key_down(KeyCode::S) {
-                    y += speed;
-                }
-                if is_key_down(KeyCode::W) {
-                    y -= speed;
-                }
-
-                draw_circle(x, y, 15.0, BLUE);
 
                 window_decorations(&mut game_state, &mut cross, "Unglitched");
             }
