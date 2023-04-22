@@ -16,6 +16,7 @@ const FOLLOWER_SPAWN_TIME: u32 = 200;
 const PATH_SPAWN_TIME: u32 = 150;
 const INSTABILITY_UP: u32 = 1;
 const MAX_UNSTABILITY: u32 = 5;
+const GLITCH_SPEED: u32 = 10;
 
 pub struct World {
     pub player: Entity,
@@ -28,6 +29,10 @@ pub struct World {
     pub pather_spawn_timer: u32,
     pub achievements: achievements::Achievements,
     pub unstabiliy: u32,
+    pub glitch_frequency_counter: u32,
+    pub x_direction: i32,
+    pub y_direction: i32,
+    pub duplicate: Option<Entity>,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -45,6 +50,10 @@ impl World {
             pather_spawn_timer: 0,
             achievements: achievements::Achievements::new(),
             unstabiliy: 0,
+            glitch_frequency_counter: 0,
+            x_direction: 0,
+            y_direction: 0,
+            duplicate: None,
         }
     }
 
@@ -217,46 +226,121 @@ impl World {
             self.bsod(game_state, resources);
         }
 
-        match self.unstabiliy {
-            1 => self.glitch(0.5, 3),
-            2 => self.glitch(1., 4),
-            3 => self.glitch(1.5, 5),
-            4 => self.glitch(2., 6),
-            5 => self.glitch(2.5, 7),
-            _ => (),
+        if self.glitch_frequency_counter == 0 {
+            match self.unstabiliy {
+                1 => {
+                    for b in &self.enemies {
+                        if rand::gen_range(0., 100.) < 0.02 {
+                            if !b.is_clone {
+                                self.duplicate = Some(b.clone());
+                                self.x_direction = rand::gen_range(-1, 1);
+                                self.y_direction = rand::gen_range(-1, 1);
+                                self.glitch_frequency_counter = GLITCH_SPEED * 3;
+                                break;
+                            }
+                        }
+                    }
+                }
+                2 => {
+                    for b in &self.enemies {
+                        if rand::gen_range(0., 100.) < 0.05 {
+                            if !b.is_clone {
+                                self.duplicate = Some(b.clone());
+                                self.x_direction = rand::gen_range(-1, 1);
+                                self.y_direction = rand::gen_range(-1, 1);
+                                self.glitch_frequency_counter = GLITCH_SPEED * 4;
+                                break;
+                            }
+                        }
+                    }
+                }
+                3 => {
+                    for b in &self.enemies {
+                        if rand::gen_range(0., 100.) < 0.07 {
+                            if !b.is_clone {
+                                self.duplicate = Some(b.clone());
+                                self.x_direction = rand::gen_range(-1, 1);
+                                self.y_direction = rand::gen_range(-1, 1);
+                                self.glitch_frequency_counter = GLITCH_SPEED * 5;
+                                break;
+                            }
+                        }
+                    }
+                }
+                4 => {
+                    for b in &self.enemies {
+                        if rand::gen_range(0., 100.) < 0.1 {
+                            if !b.is_clone {
+                                self.duplicate = Some(b.clone());
+                                self.x_direction = rand::gen_range(-1, 1);
+                                self.y_direction = rand::gen_range(-1, 1);
+                                self.glitch_frequency_counter = GLITCH_SPEED * 6;
+                                break;
+                            }
+                        }
+                    }
+                }
+                5 => {
+                    for b in &self.enemies {
+                        if rand::gen_range(0., 100.) < 1. {
+                            if !b.is_clone {
+                                self.duplicate = Some(b.clone());
+                                self.x_direction = rand::gen_range(-1, 1);
+                                self.y_direction = rand::gen_range(-1, 1);
+                                self.glitch_frequency_counter = GLITCH_SPEED * 7;
+                                break;
+                            }
+                        }
+                    }
+                }
+                _ => (),
+            }
+        } else {
+            if let Some(to_duplicate) = &mut self.duplicate {
+                to_duplicate.tick(self.player.pos.clone());
+            }
+            if let Some(to_duplicate) = &self.duplicate {
+                if self.glitch_frequency_counter % GLITCH_SPEED == 0 {
+                    self.glitch(
+                        (*to_duplicate).clone(),
+                        self.x_direction,
+                        self.y_direction,
+                        resources,
+                    );
+                }
+            }
+            self.glitch_frequency_counter -= 1;
         }
     }
 
-    pub fn glitch(&mut self, percentage: f32, amount: i32) {
-        let mut duplicate = None;
-        for b in &self.enemies {
-            if rand::gen_range(0., 100.) < percentage {
-                if !b.is_clone {
-                    duplicate = Some(b.clone());
-                }
-                break;
-            }
+    pub fn glitch(
+        &mut self,
+        duplicate: Entity,
+        x_direction: i32,
+        y_direction: i32,
+        resources: &Resources,
+    ) {
+        let mut clone = duplicate.clone();
+        if y_direction < 0 {
+            clone.pos.y -= 0.3;
+        } else {
+            clone.pos.y += 0.3;
         }
-        if let Some(duplicate) = duplicate {
-            let x_direction = rand::gen_range(-1, 1);
-            let y_direction = rand::gen_range(-1, 1);
-            for i in 1..amount {
-                let mut clone = duplicate.clone();
-                if y_direction < 0 {
-                    clone.pos.y -= 0.3 * i as f32;
-                } else {
-                    clone.pos.y += 0.3 * i as f32;
-                }
-                if x_direction < 0 {
-                    clone.pos.x -= 0.3 * i as f32;
-                } else {
-                    clone.pos.x += 0.3 * i as f32;
-                }
-                clone.is_clone = true;
-
-                self.enemies.push(clone);
-            }
+        if x_direction < 0 {
+            clone.pos.x -= 0.3;
+        } else {
+            clone.pos.x += 0.3;
         }
+        clone.is_clone = true;
+        play_sound(
+            resources.glitch_sound,
+            PlaySoundParams {
+                looped: false,
+                volume: 0.2,
+            },
+        );
+        self.enemies.push(clone.clone());
+        self.duplicate = Some(clone);
     }
 
     pub fn bsod(&mut self, game_state: &mut GameState, resources: &Resources) {

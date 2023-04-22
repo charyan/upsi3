@@ -10,6 +10,7 @@ pub struct Resources {
 
     pub heart: Texture2D,
 
+    pub glitch_sound: Sound,
     pub bsod_sound: Sound,
     pub small_bug_sound: Sound,
     pub explosion_sound: Sound,
@@ -62,6 +63,11 @@ impl Resources {
                 .await
                 .unwrap();
 
+        let glitch_sound =
+            load_sound_from_bytes(include_bytes!("../assets/sounds/glitch_sound.wav"))
+                .await
+                .unwrap();
+
         Resources {
             player,
             bullet,
@@ -73,6 +79,7 @@ impl Resources {
             explosion_sound,
             hit_sound,
             picking_item_sound,
+            glitch_sound,
         }
     }
 }
