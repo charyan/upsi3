@@ -127,16 +127,18 @@ impl World {
                         volume: 0.5,
                     },
                 );
-                if let Some(new_hp) = self.hp.checked_sub(1) {
-                    self.hp = new_hp;
-                } else {
-                    self.hp = 3;
-                    if self.achievements.achievements[2].unlocked == false {
-                        self.achievements.achievements[2].unlock();
-                        *bsod_message = self.achievements.achievements[2].name.to_owned();
-                        display_bsod = true;
+                if self.player.hit_anim == 0 {
+                    if let Some(new_hp) = self.hp.checked_sub(1) {
+                        self.hp = new_hp;
                     } else {
-                        to_raise_unstability = true;
+                        self.hp = 3;
+                        if self.achievements.achievements[2].unlocked == false {
+                            self.achievements.achievements[2].unlock();
+                            *bsod_message = self.achievements.achievements[2].name.to_owned();
+                            display_bsod = true;
+                        } else {
+                            to_raise_unstability = true;
+                        }
                     }
                 }
                 b.alive = false;
