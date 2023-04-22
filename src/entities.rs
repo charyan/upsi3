@@ -23,8 +23,8 @@ const SPAWN_DIST: f32 = 42.;
 const BULLET_SPEED: f32 = 1.;
 const FOLLOWER_SPEED: f32 = 1.;
 const PATHER_SPEED: f32 = 1.;
-const WORLD_WIDTH: f32 = 40.;
-const WORLD_HEIGHT: f32 = 30.;
+pub const WORLD_WIDTH: f32 = 40.;
+pub const WORLD_HEIGHT: f32 = 30.;
 const CENTER: Vec2 = Vec2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.);
 
 fn random_outside_pos() -> Vec2 {
@@ -46,7 +46,7 @@ impl Entity {
             pos: CENTER,
             speed: Vec2::ZERO,
             e_type: EntityType::Player,
-            radius: 2.,
+            radius: 1.,
             alive: true,
         }
     }
@@ -59,7 +59,7 @@ impl Entity {
             pos,
             speed,
             e_type: EntityType::Bullet,
-            radius: 1.,
+            radius: 0.5,
             alive: true,
         }
     }
@@ -72,7 +72,7 @@ impl Entity {
             pos,
             speed,
             e_type: EntityType::Follower,
-            radius: 1.,
+            radius: 0.5,
             alive: true,
         }
     }
@@ -91,7 +91,7 @@ impl Entity {
             pos,
             speed,
             e_type: EntityType::Pather(path),
-            radius: 1.,
+            radius: 0.5,
             alive: true,
         }
     }
@@ -103,7 +103,7 @@ impl Entity {
             pos,
             speed: Vec2::ZERO,
             e_type: EntityType::HealItem,
-            radius: 1.,
+            radius: 0.5,
             alive: true,
         }
     }
@@ -120,13 +120,17 @@ impl Entity {
     }
 
     fn player_tick(&mut self) {
-        self.pos += if (self.pos + self.speed).x > WORLD_WIDTH
-            || (self.pos + self.speed).y > WORLD_HEIGHT
-            || (self.pos + self.speed).x < 0.
-        {
-            Vec2::ZERO
-        } else {
-            self.speed
+        self.pos += self.speed;
+        self.speed *= 0.9;
+
+        if self.pos.x - self.radius < 0. {
+            self.pos.x = self.radius;
+        } else if self.pos.x + self.radius > WORLD_WIDTH {
+            self.pos.x = WORLD_WIDTH - self.radius;
+        }
+
+        if self.pos.y + self.radius > WORLD_HEIGHT {
+            self.pos.y = WORLD_HEIGHT - self.radius;
         }
     }
 

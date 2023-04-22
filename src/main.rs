@@ -6,6 +6,7 @@ pub mod world;
 use std::default;
 
 use achievements::Achievements;
+use entities::WORLD_WIDTH;
 use macroquad::{
     audio::{play_sound, PlaySoundParams},
     prelude::*,
@@ -220,15 +221,39 @@ fn draw_bsod_text(message: String) {
     );
 }
 
-fn draw_game(world: &World, resources: &Resources) {
-    let player_pos = world.player.pos;
+fn draw_sprite(texture: Texture2D, mut pos: Vec2, mut radius: f32, screen_width: f32) {
+    let scale = screen_width / WORLD_WIDTH;
 
-    println!("{} {}", player_pos.x, player_pos.y);
+    pos -= Vec2::new(radius, radius);
 
-    draw_circle(player_pos.x, player_pos.y, 15.0, BLUE);
+    pos *= scale;
+
+    radius *= scale;
+
+    draw_texture_ex(
+        texture,
+        pos.x,
+        pos.y,
+        WHITE,
+        DrawTextureParams {
+            dest_size: Some(Vec2::new(radius * 2., radius * 2.)),
+            source: None,
+            rotation: 0.,
+            flip_x: false,
+            flip_y: false,
+            pivot: None,
+        },
+    );
 }
 
-#[macroquad::main("BasicShapes")]
+fn draw_game(world: &World, resources: &Resources) {
+    let player_pos = world.player.pos;
+    let player_radius = world.player.radius;
+
+    draw_sprite(resources.player, player_pos, player_radius, screen_width());
+}
+
+#[macroquad::main("Unglitched")]
 async fn main() {
     let mut world = World::new();
 
