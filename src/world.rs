@@ -28,6 +28,7 @@ pub struct World {
     pub pather_spawn_timer: u32,
     pub achievements: achievements::Achievements,
     pub unstabiliy: u32,
+    pub has_game_started: bool,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -45,6 +46,7 @@ impl World {
             pather_spawn_timer: 0,
             achievements: achievements::Achievements::new(),
             unstabiliy: 0,
+            has_game_started: false,
         }
     }
 

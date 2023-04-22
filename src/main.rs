@@ -7,6 +7,7 @@ use std::{f32::consts::PI, u8};
 
 use achievements::Achievements;
 use entities::{EntityType, WORLD_WIDTH};
+use macroquad::ui::{hash, root_ui, widgets, Skin};
 use macroquad::{
     audio::{play_sound, PlaySoundParams},
     prelude::*,
@@ -43,7 +44,7 @@ impl UIElement {
         }
     }
 
-    pub fn draw(&self) {
+    pub fn draw(&mut self) {
         if self.visible {
             draw_texture_ex(
                 self.texture,
@@ -99,6 +100,7 @@ struct Popup {
     pub height: f32,
     pub style: Popup_Style,
     pub visible: bool,
+    pub text: &'static str,
 }
 
 impl Popup {
@@ -114,6 +116,7 @@ impl Popup {
             height: 400.,
             style: Popup_Style::INFO,
             visible: true,
+            text: "Some text here",
         }
     }
 
@@ -173,7 +176,7 @@ impl Popup {
             );
 
             draw_text(
-                "Some text here",
+                self.text,
                 self.position.x + 20.,
                 self.position.y + TITLE_BAR_HEIGHT + 50.,
                 30.,
@@ -445,6 +448,9 @@ async fn main() {
 
     let resources = Resources::load().await;
 
+    let mut input_text = String::new();
+    let mut enable_input = true;
+
     let mut wallpaper = UIElement::new(
         vec2(0., 0.),
         vec2(screen_width(), screen_height()),
@@ -488,6 +494,20 @@ async fn main() {
     };
 
     let mut popup = Popup::new();
+    popup.visible = false;
+
+    let skin = {
+        let editbox_style = root_ui()
+            .style_builder()
+            .background_margin(RectOffset::new(2., 2., 2., 2.))
+            .font_size(35)
+            .build();
+
+        Skin {
+            editbox_style,
+            ..root_ui().default_skin()
+        }
+    };
 
     loop {
         clear_background(BLACK);
@@ -506,6 +526,8 @@ async fn main() {
                         && icon_ung.collide(Vec2::new(mouse_x, mouse_y))
                     {
                         game_state = GameState::Game;
+                        popup.visible = true;
+                        enable_input = true;
                     }
 
                     if is_mouse_button_pressed(MouseButton::Left)
@@ -523,11 +545,42 @@ async fn main() {
             }
 
             GameState::Game => {
-                world.tick(&resources, &mut game_state, &mut bsod_message);
-                draw_game(&world, &resources);
+                if world.has_game_started {
+                    world.tick(&resources, &mut game_state, &mut bsod_message);
+                    draw_game(&world, &resources);
 
-                if is_key_down(KeyCode::C) {
-                    game_state = GameState::BSOD;
+                    if is_key_down(KeyCode::C) {
+                        game_state = GameState::BSOD;
+                    }
+                } else {
+                    popup.text = "Enter your name (max 8 char)";
+                }
+
+                if popup.visible {
+                    world.has_game_started = false;
+
+                    root_ui().push_skin(&skin);
+                    root_ui().window(
+                        hash!(),
+                        vec2(screen_width() / 2. - 250., screen_height() / 2.),
+                        vec2(500., 45.),
+                        |ui| {
+                            ui.input_text(hash!(), "", &mut input_text);
+                        },
+                    );
+                    // root_ui().pop_skin();
+                    // root_ui().close_current_window();
+                } else {
+                    world.has_game_started = true;
+                    enable_input = false;
+
+                    if world.achievements.achievements[0].unlocked {
+                        // TODO: Raise instability
+                    } else if input_text.len() > 8 {
+                        world.achievements.achievements[0].unlock();
+                        bsod_message = world.achievements.achievements[0].name.to_string();
+                        game_state = GameState::BSOD;
+                    }
                 }
 
                 window_decorations(&mut game_state, &mut cross, "Unglitched");
@@ -584,6 +637,9 @@ async fn main() {
             }
 
             GameState::BSOD => {
+                popup.visible = false;
+                enable_input = false;
+
                 draw_rectangle(0., 0., screen_width(), screen_height(), DARKBLUE);
 
                 draw_bsod_text(bsod_message.to_string());
@@ -611,6 +667,7 @@ async fn main() {
         }
 
         popup.draw();
+
         glitch_effect.run();
 
         next_frame().await
