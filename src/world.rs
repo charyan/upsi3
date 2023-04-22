@@ -1,6 +1,6 @@
 use crate::{
     entities::{Entity, EntityType},
-    resources,
+    resources::{self, Resources},
 };
 
 use macroquad::{
@@ -9,9 +9,9 @@ use macroquad::{
 };
 
 const DESTROY_RANGE: f32 = 10.;
-const BULLET_SPAWNER: i32 = 60;
-const FOLLOWER_SPAWNER: i32 = 200;
-const PATHER_SPAWNER: i32 = 150;
+const BULLET_SPAWN_TIME: u32 = 60;
+const FOLLOWER_SPAWN_TIME: u32 = 200;
+const PATH_SPAWN_TIME: u32 = 150;
 
 pub struct World {
     pub player: Entity,
@@ -19,6 +19,9 @@ pub struct World {
     pub items: Vec<Entity>,
     pub hp: u8,
     pub mana: u8,
+    pub bullet_spawn_timer: u32,
+    pub follower_spawn_timer: u32,
+    pub pather_spawn_timer: u32,
 }
 
 const PLAYER_SPEED: f32 = 0.1;
@@ -31,35 +34,34 @@ impl World {
             items: Vec::new(),
             hp: 3,
             mana: 4,
+            bullet_spawn_timer: 0,
+            follower_spawn_timer: 0,
+            pather_spawn_timer: 0,
         }
     }
 
-    pub fn tick(&mut self, resources: &resources::Resources) {
-        let mut bullet_spawn_counter = 0;
-        let mut follower_spawn_counter = 0;
-        let mut pather_spawn_counter = 76;
-
-        if bullet_spawn_counter == BULLET_SPAWNER {
-            bullet_spawn_counter = 0;
+    pub fn tick(&mut self, resources: &Resources) {
+        if self.bullet_spawn_timer > BULLET_SPAWN_TIME {
+            self.bullet_spawn_timer = 0;
             self.enemies
                 .push(Entity::new_random_bullet(self.player.pos));
         } else {
-            bullet_spawn_counter += 1;
+            self.bullet_spawn_timer += 1;
         }
 
-        if follower_spawn_counter == FOLLOWER_SPAWNER {
-            follower_spawn_counter = 0;
+        if self.follower_spawn_timer > FOLLOWER_SPAWN_TIME {
+            self.follower_spawn_timer = 0;
             self.enemies
                 .push(Entity::new_random_follower(self.player.pos));
         } else {
-            follower_spawn_counter += 1;
+            self.follower_spawn_timer += 1;
         }
 
-        if pather_spawn_counter == PATHER_SPAWNER {
-            pather_spawn_counter = 0;
+        if self.pather_spawn_timer == PATH_SPAWN_TIME {
+            self.pather_spawn_timer = 0;
             self.enemies.push(Entity::new_random_pather());
         } else {
-            pather_spawn_counter += 1;
+            self.pather_spawn_timer += 1;
         }
 
         if is_key_down(KeyCode::D) {

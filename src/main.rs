@@ -292,6 +292,17 @@ fn draw_game(world: &World, resources: &Resources) {
     let player_radius = world.player.radius;
 
     draw_sprite(resources.player, player_pos, player_radius, screen_width());
+
+    for enemy in &world.enemies {
+        let texture = match &enemy.e_type {
+            EntityType::Bullet => resources.bullet,
+            EntityType::Follower => resources.follower,
+            EntityType::Pather(_) => resources.pather,
+            _ => unreachable!(),
+        };
+
+        draw_sprite(texture, enemy.pos, enemy.radius, screen_width());
+    }
 }
 
 #[macroquad::main("Unglitched")]

@@ -7,7 +7,7 @@ use macroquad::prelude::*;
 
 pub enum EntityType {
     Bullet,                 // Red circle
-    Follower,               // Blue triangle
+    Follower,               // Yellow triangle
     Pather(VecDeque<Vec2>), // Green square
     Player,                 // The player
     HealItem,               // Hearth that heals the player
