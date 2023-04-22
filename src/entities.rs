@@ -5,6 +5,7 @@ use std::{
 
 use macroquad::prelude::*;
 
+#[derive(Clone)]
 pub enum EntityType {
     Bullet,                 // Red circle
     Follower,               // Yellow triangle
@@ -14,6 +15,7 @@ pub enum EntityType {
     ManaItem,               // blue circle that give mana to player
 }
 
+#[derive(Clone)]
 pub struct Entity {
     pub pos: Vec2,
     pub speed: Vec2,
@@ -21,6 +23,7 @@ pub struct Entity {
     pub radius: f32,
     pub alive: bool,
     pub rotation: f32,
+    pub is_clone: bool,
 }
 
 const SPAWN_DIST: f32 = 42.;
@@ -29,7 +32,7 @@ const FOLLOWER_ACCELERATION: f32 = 0.01;
 const PATHER_SPEED: f32 = 0.25;
 pub const WORLD_WIDTH: f32 = 40.;
 pub const WORLD_HEIGHT: f32 = 30.;
-const CENTER: Vec2 = Vec2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.);
+pub const CENTER: Vec2 = Vec2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.);
 
 fn random_outside_pos() -> Vec2 {
     let angle = rand::gen_range(0., TAU);
@@ -53,6 +56,7 @@ impl Entity {
             radius: 0.5,
             alive: true,
             rotation: PI / 2.,
+            is_clone: false,
         }
     }
 
@@ -67,6 +71,7 @@ impl Entity {
             radius: 0.25,
             alive: true,
             rotation: 0.,
+            is_clone: false,
         }
     }
 
@@ -81,6 +86,7 @@ impl Entity {
             radius: 0.5,
             alive: true,
             rotation: speed.y.atan2(speed.x),
+            is_clone: false,
         }
     }
 
@@ -101,6 +107,7 @@ impl Entity {
             radius: 0.25,
             alive: true,
             rotation: 0.,
+            is_clone: false,
         }
     }
 
@@ -114,6 +121,7 @@ impl Entity {
             radius: 0.5,
             alive: true,
             rotation: PI / 2.,
+            is_clone: false,
         }
     }
 
@@ -127,6 +135,7 @@ impl Entity {
             radius: 0.5,
             alive: true,
             rotation: PI / 2.,
+            is_clone: false,
         }
     }
 

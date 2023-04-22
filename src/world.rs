@@ -1,6 +1,6 @@
 use crate::{
     achievements,
-    entities::{Entity, EntityType},
+    entities::{self, Entity, EntityType},
     resources::{self, Resources},
     GameState,
 };
@@ -39,7 +39,7 @@ impl World {
             enemies: Vec::new(),
             items: Vec::new(),
             hp: 3,
-            mana: 4,
+            mana: 3,
             bullet_spawn_timer: 0,
             follower_spawn_timer: 0,
             pather_spawn_timer: 0,
@@ -48,12 +48,18 @@ impl World {
         }
     }
 
+    pub fn raise_unstability(&mut self) {
+        self.unstabiliy += INSTABILITY_UP;
+    }
+
     pub fn tick(
         &mut self,
         resources: &Resources,
         game_state: &mut GameState,
         bsod_message: &mut String,
     ) {
+        let mut to_raise_unstability = false;
+
         if self.bullet_spawn_timer > BULLET_SPAWN_TIME {
             self.bullet_spawn_timer = 0;
             self.enemies
@@ -97,6 +103,7 @@ impl World {
 
         self.player.tick(Vec2::ZERO);
 
+        let mut display_bsod = false;
         for b in &mut self.enemies {
             b.tick(self.player.pos);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
@@ -114,10 +121,9 @@ impl World {
                     if self.achievements.achievements[2].unlocked == false {
                         self.achievements.achievements[2].unlock();
                         *bsod_message = self.achievements.achievements[2].name.to_owned();
-                        *game_state = GameState::BSOD;
-                        play_sound(resources.bsod_sound, PlaySoundParams::default())
+                        display_bsod = true;
                     } else {
-                        self.unstabiliy += INSTABILITY_UP;
+                        to_raise_unstability = true;
                     }
                 }
                 b.alive = false;
@@ -140,10 +146,9 @@ impl World {
                             if self.achievements.achievements[3].unlocked == false {
                                 self.achievements.achievements[3].unlock();
                                 *bsod_message = self.achievements.achievements[3].name.to_owned();
-                                *game_state = GameState::BSOD;
-                                play_sound(resources.bsod_sound, PlaySoundParams::default())
+                                display_bsod = true;
                             } else {
-                                self.unstabiliy += INSTABILITY_UP;
+                                to_raise_unstability = true;
                             }
                         } else {
                             self.hp += 1;
@@ -156,10 +161,9 @@ impl World {
                             if self.achievements.achievements[5].unlocked == false {
                                 self.achievements.achievements[5].unlock();
                                 *bsod_message = self.achievements.achievements[5].name.to_owned();
-                                *game_state = GameState::BSOD;
-                                play_sound(resources.bsod_sound, PlaySoundParams::default())
+                                display_bsod = true;
                             } else {
-                                self.unstabiliy += INSTABILITY_UP;
+                                to_raise_unstability = true;
                             }
                         } else {
                             self.mana += 1;
@@ -175,10 +179,9 @@ impl World {
             if self.achievements.achievements[6].unlocked == false {
                 self.achievements.achievements[6].unlock();
                 *bsod_message = self.achievements.achievements[6].name.to_owned();
-                *game_state = GameState::BSOD;
-                play_sound(resources.bsod_sound, PlaySoundParams::default())
+                display_bsod = true;
             } else {
-                self.unstabiliy += INSTABILITY_UP;
+                to_raise_unstability = true;
             }
         }
 
@@ -202,9 +205,72 @@ impl World {
         if self.unstabiliy > MAX_UNSTABILITY {
             self.achievements.achievements[1].unlock();
             *bsod_message = self.achievements.achievements[1].name.to_owned();
-            *game_state = GameState::BSOD;
-            play_sound(resources.bsod_sound, PlaySoundParams::default())
+            self.bsod(game_state, resources);
         }
+
+        if to_raise_unstability {
+            self.raise_unstability();
+        }
+
+        if display_bsod {
+            self.bsod(game_state, resources);
+        }
+
+        match self.unstabiliy {
+            1 => self.glitch(0.5, 3),
+            2 => self.glitch(1., 4),
+            3 => self.glitch(1.5, 5),
+            4 => self.glitch(2., 6),
+            5 => self.glitch(2.5, 7),
+            _ => (),
+        }
+    }
+
+    pub fn glitch(&mut self, percentage: f32, amount: i32) {
+        let mut duplicate = None;
+        for b in &self.enemies {
+            if rand::gen_range(0., 100.) < percentage {
+                if !b.is_clone {
+                    duplicate = Some(b.clone());
+                }
+                break;
+            }
+        }
+        if let Some(duplicate) = duplicate {
+            let x_direction = rand::gen_range(-1, 1);
+            let y_direction = rand::gen_range(-1, 1);
+            for i in 1..amount {
+                let mut clone = duplicate.clone();
+                if y_direction < 0 {
+                    clone.pos.y -= 1. * i as f32;
+                } else {
+                    clone.pos.y += 1. * i as f32;
+                }
+                if x_direction < 0 {
+                    clone.pos.x -= 1. * i as f32;
+                } else {
+                    clone.pos.x += 1. * i as f32;
+                }
+                clone.is_clone = true;
+
+                self.enemies.push(clone);
+            }
+        }
+    }
+
+    pub fn bsod(&mut self, game_state: &mut GameState, resources: &Resources) {
+        *game_state = GameState::BSOD;
+        play_sound(resources.bsod_sound, PlaySoundParams::default());
+        self.player.pos = entities::CENTER;
+        self.player.speed = Vec2::ZERO;
+        self.hp = 3;
+        self.mana = 3;
+        self.unstabiliy = 0;
+        self.bullet_spawn_timer = 0;
+        self.pather_spawn_timer = 0;
+        self.follower_spawn_timer = 0;
+        self.enemies.clear();
+        self.items.clear();
     }
 
     pub fn power_destroy(
@@ -240,7 +306,7 @@ impl World {
                 *game_state = GameState::BSOD;
                 play_sound(resources.bsod_sound, PlaySoundParams::default())
             } else {
-                self.unstabiliy += INSTABILITY_UP;
+                self.raise_unstability();
             }
         }
     }
