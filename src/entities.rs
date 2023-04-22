@@ -175,6 +175,7 @@ impl Entity {
     }
 
     fn pather_tick(&mut self) {
+        self.rotation += 0.01;
         let path = match &mut self.e_type {
             EntityType::Pather(path) => path,
             _ => {
