@@ -259,8 +259,6 @@ async fn main() {
 
     let resources = Resources::load().await;
 
-    play_sound(resources.bsod_sound, PlaySoundParams::default());
-
     let mut wallpaper = UIElement::new(
         vec2(0., 0.),
         vec2(screen_width(), screen_height()),
@@ -335,7 +333,7 @@ async fn main() {
             }
 
             GameState::Game => {
-                world.tick();
+                world.tick(&resources);
                 draw_game(&world, &resources);
 
                 if is_key_down(KeyCode::C) {

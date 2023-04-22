@@ -4,8 +4,12 @@ use macroquad::prelude::*;
 pub struct Resources {
     pub player: Texture2D,
     pub bullet: Texture2D,
-    pub bsod_sound: Sound,
     pub heart: Texture2D,
+    pub bsod_sound: Sound,
+    pub small_bug_sound: Sound,
+    pub explosion_sound: Sound,
+    pub hit_sound: Sound,
+    pub picking_item_sound: Sound,
 }
 
 fn new_texture(bytes: &[u8]) -> Texture2D {
@@ -25,7 +29,7 @@ impl Resources {
             .await
             .unwrap();
 
-        let samllbug_sound =
+        let small_bug_sound =
             load_sound_from_bytes(include_bytes!("../assets/sounds/smallbug_sound.wav"))
                 .await
                 .unwrap();
@@ -54,6 +58,10 @@ impl Resources {
             bullet,
             heart,
             bsod_sound,
+            small_bug_sound,
+            explosion_sound,
+            hit_sound,
+            picking_item_sound,
         }
     }
 }

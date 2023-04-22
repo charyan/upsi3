@@ -1,6 +1,12 @@
-use crate::entities::{Entity, EntityType};
+use crate::{
+    entities::{Entity, EntityType},
+    resources,
+};
 
-use macroquad::prelude::*;
+use macroquad::{
+    audio::{play_sound, PlaySoundParams},
+    prelude::*,
+};
 
 const DESTROY_RANGE: f32 = 10.;
 const BULLET_SPAWNER: i32 = 60;
@@ -28,7 +34,7 @@ impl World {
         }
     }
 
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self, resources: &resources::Resources) {
         let mut bullet_spawn_counter = 0;
         let mut follower_spawn_counter = 0;
         let mut pather_spawn_counter = 76;
@@ -41,7 +47,7 @@ impl World {
             bullet_spawn_counter += 1;
         }
 
-        if follower_spawn_counter == BULLET_SPAWNER {
+        if follower_spawn_counter == FOLLOWER_SPAWNER {
             follower_spawn_counter = 0;
             self.ennemies
                 .push(Entity::new_random_follower(self.player.pos));
@@ -49,7 +55,7 @@ impl World {
             follower_spawn_counter += 1;
         }
 
-        if pather_spawn_counter == BULLET_SPAWNER {
+        if pather_spawn_counter == PATHER_SPAWNER {
             pather_spawn_counter = 0;
             self.ennemies.push(Entity::new_random_pather());
         } else {
@@ -68,6 +74,9 @@ impl World {
         if is_key_down(KeyCode::W) {
             self.player.speed.y -= PLAYER_SPEED;
         }
+        if is_key_down(KeyCode::Space) {
+            self.power_destroy(&resources);
+        }
 
         self.player.speed *= 0.9;
 
@@ -76,6 +85,7 @@ impl World {
         for b in &mut self.ennemies {
             b.tick(Vec2::ZERO);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
+                play_sound(resources.hit_sound, PlaySoundParams::default());
                 if let Some(new_hp) = self.hp.checked_sub(1) {
                     self.hp = new_hp;
                 } else {
@@ -86,6 +96,7 @@ impl World {
 
         for i in &mut self.items {
             if (i.pos - self.player.pos).length() < (self.player.radius + i.radius) {
+                play_sound(resources.picking_item_sound, PlaySoundParams::default());
                 match &i.e_type {
                     EntityType::HealItem => {
                         if self.hp + 1 > 3 {
@@ -113,7 +124,9 @@ impl World {
         self.items.retain(|e| e.alive);
     }
 
-    pub fn power_destroy(&mut self) {
+    pub fn power_destroy(&mut self, resources: &resources::Resources) {
+        play_sound(resources.explosion_sound, PlaySoundParams::default());
+
         for b in &mut self.ennemies {
             if (b.pos - self.player.pos).length() < (self.player.radius + DESTROY_RANGE) {
                 b.alive = false;
