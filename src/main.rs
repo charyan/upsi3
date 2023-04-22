@@ -61,10 +61,18 @@ impl UIElement {
     }
 }
 
-fn window_decorations(state: &mut GameState, cross: &mut UIElement) {
+fn window_decorations(state: &mut GameState, cross: &mut UIElement, title: &str) {
     draw_rectangle(0., 0., screen_width(), TITLE_BAR_HEIGHT, LIGHTGRAY);
     cross.position = vec2(screen_width() - 5. - 50., 5.);
     cross.draw();
+
+    draw_text(
+        title,
+        screen_width() / 2. - get_text_center(title, None, 40, 1., 0.).x,
+        TITLE_BAR_HEIGHT / 2. + 5.,
+        40.,
+        BLACK,
+    );
 
     let (mouse_x, mouse_y) = mouse_position();
     if is_mouse_button_pressed(MouseButton::Left) && cross.collide(Vec2::new(mouse_x, mouse_y)) {
@@ -256,10 +264,6 @@ async fn main() {
                 icon_dbg.draw();
                 icon_ach.draw();
 
-                // if root_ui().button(None, "Unglitched") {
-                //     game_state = GAME_STATE::GAME;
-                // }
-
                 let (mouse_x, mouse_y) = mouse_position();
                 if is_mouse_button_pressed(MouseButton::Left)
                     && icon_ung.collide(Vec2::new(mouse_x, mouse_y))
@@ -271,6 +275,12 @@ async fn main() {
                     && icon_ach.collide(Vec2::new(mouse_x, mouse_y))
                 {
                     game_state = GameState::Achievements;
+                }
+
+                if is_mouse_button_pressed(MouseButton::Left)
+                    && icon_dbg.collide(Vec2::new(mouse_x, mouse_y))
+                {
+                    game_state = GameState::DebugGame;
                 }
             }
 
@@ -294,10 +304,12 @@ async fn main() {
 
                 draw_circle(x, y, 15.0, BLUE);
 
-                window_decorations(&mut game_state, &mut cross);
+                window_decorations(&mut game_state, &mut cross, "Unglitched");
             }
 
-            GameState::DebugGame => {}
+            GameState::DebugGame => {
+                window_decorations(&mut game_state, &mut cross, "Unglitched (Debug mode)");
+            }
 
             GameState::Achievements => {
                 let ach_x = 50.;
@@ -319,7 +331,7 @@ async fn main() {
                     ach_y += ach.texture.height() + 10. + 10.;
                 }
 
-                window_decorations(&mut game_state, &mut cross);
+                window_decorations(&mut game_state, &mut cross, "Achievements");
             }
 
             GameState::BSOD => {
