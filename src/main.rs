@@ -417,7 +417,11 @@ fn draw_game(world: &World, resources: &Resources) {
     let player_radius = world.player.radius;
 
     draw_sprite(
-        resources.player,
+        if world.player.hit_anim % 2 == 0 {
+            resources.player
+        } else {
+            resources.player_hit
+        },
         player_pos,
         player_radius,
         screen_width(),
@@ -425,7 +429,7 @@ fn draw_game(world: &World, resources: &Resources) {
     );
 
     for enemy in &world.enemies {
-        let texture = match &enemy.e_type {
+        let texture = match enemy.e_type {
             EntityType::Bullet => resources.bullet,
             EntityType::Follower => resources.follower,
             EntityType::Pather(_) => resources.pather,
@@ -438,6 +442,22 @@ fn draw_game(world: &World, resources: &Resources) {
             enemy.radius,
             screen_width(),
             enemy.rotation,
+        );
+    }
+
+    for item in &world.items {
+        let texture = match item.e_type {
+            EntityType::HealItem => resources.heart,
+            EntityType::ManaItem => resources.energy,
+            _ => unreachable!(),
+        };
+
+        draw_sprite(
+            texture,
+            item.pos,
+            item.radius,
+            screen_width(),
+            item.rotation,
         );
     }
 }
@@ -457,19 +477,19 @@ async fn main() {
         include_bytes!("../assets/images/wallpaper.png"),
     );
 
-    let mut icon_ung = UIElement::new(
+    let icon_ung = UIElement::new(
         vec2(20., 20.),
         vec2(64., 80.),
         include_bytes!("../assets/images/icon_ung.png"),
     );
 
-    let mut icon_dbg = UIElement::new(
+    let icon_dbg = UIElement::new(
         vec2(20., 120.),
         vec2(64., 80.),
         include_bytes!("../assets/images/icon_dbg.png"),
     );
 
-    let mut icon_ach = UIElement::new(
+    let icon_ach = UIElement::new(
         vec2(20., 220.),
         vec2(64., 80.),
         include_bytes!("../assets/images/icon_ach.png"),

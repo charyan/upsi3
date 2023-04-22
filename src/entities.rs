@@ -24,6 +24,7 @@ pub struct Entity {
     pub alive: bool,
     pub rotation: f32,
     pub is_clone: bool,
+    pub hit_anim: u32,
 }
 
 const SPAWN_DIST: f32 = 42.;
@@ -57,6 +58,7 @@ impl Entity {
             alive: true,
             rotation: PI / 2.,
             is_clone: false,
+            hit_anim: 0,
         }
     }
 
@@ -72,6 +74,7 @@ impl Entity {
             alive: true,
             rotation: 0.,
             is_clone: false,
+            hit_anim: 0,
         }
     }
 
@@ -87,6 +90,7 @@ impl Entity {
             alive: true,
             rotation: speed.y.atan2(speed.x),
             is_clone: false,
+            hit_anim: 0,
         }
     }
 
@@ -108,6 +112,7 @@ impl Entity {
             alive: true,
             rotation: 0.,
             is_clone: false,
+            hit_anim: 0,
         }
     }
 
@@ -120,8 +125,9 @@ impl Entity {
             e_type: EntityType::HealItem,
             radius: 0.5,
             alive: true,
-            rotation: PI / 2.,
             is_clone: false,
+            rotation: rand::gen_range(0., TAU),
+            hit_anim: 0,
         }
     }
 
@@ -134,12 +140,17 @@ impl Entity {
             e_type: EntityType::ManaItem,
             radius: 0.5,
             alive: true,
-            rotation: PI / 2.,
             is_clone: false,
+            rotation: rand::gen_range(0., TAU),
+            hit_anim: 0,
         }
     }
 
     pub fn tick(&mut self, target_pos: Vec2) {
+        if self.hit_anim > 0 {
+            self.hit_anim -= 1;
+        }
+
         match &mut self.e_type {
             EntityType::Bullet => self.bullet_tick(),
             EntityType::Follower => self.follower_tick(target_pos),
