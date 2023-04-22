@@ -3,6 +3,9 @@ use crate::entities::{Entity, EntityType};
 use macroquad::prelude::*;
 
 const DESTROY_RANGE: f32 = 10.;
+const BULLET_SPAWNER: i32 = 60;
+const FOLLOWER_SPAWNER: i32 = 200;
+const PATHER_SPAWNER: i32 = 150;
 
 pub struct World {
     pub player: Entity,
@@ -26,6 +29,33 @@ impl World {
     }
 
     pub fn tick(&mut self) {
+        let mut bullet_spawn_counter = 0;
+        let mut follower_spawn_counter = 0;
+        let mut pather_spawn_counter = 76;
+
+        if bullet_spawn_counter == BULLET_SPAWNER {
+            bullet_spawn_counter = 0;
+            self.ennemies
+                .push(Entity::new_random_bullet(self.player.pos));
+        } else {
+            bullet_spawn_counter += 1;
+        }
+
+        if follower_spawn_counter == BULLET_SPAWNER {
+            follower_spawn_counter = 0;
+            self.ennemies
+                .push(Entity::new_random_follower(self.player.pos));
+        } else {
+            follower_spawn_counter += 1;
+        }
+
+        if pather_spawn_counter == BULLET_SPAWNER {
+            pather_spawn_counter = 0;
+            self.ennemies.push(Entity::new_random_pather());
+        } else {
+            pather_spawn_counter += 1;
+        }
+
         if is_key_down(KeyCode::D) {
             self.player.speed.x += PLAYER_SPEED;
         }
