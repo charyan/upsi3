@@ -3,6 +3,8 @@ pub mod entities;
 pub mod resources;
 pub mod world;
 
+use std::f32::consts::PI;
+
 use achievements::Achievements;
 use entities::{EntityType, WORLD_WIDTH};
 use macroquad::{
@@ -262,6 +264,47 @@ fn draw_game(world: &World, resources: &Resources) {
     }
 }
 
+struct Glitch_Effect {
+    count: u32,
+    intensity_multiplicator: f32,
+}
+
+impl Glitch_Effect {
+    pub fn set(&mut self, count: u32, intensity_multiplicator: f32) {
+        self.count = count;
+        self.intensity_multiplicator = intensity_multiplicator;
+    }
+
+    pub fn run(&mut self) {
+        if self.count > 0 {
+            let mut t = Texture2D::from_image(&get_screen_data());
+
+            draw_texture_ex(
+                t,
+                rand::RandomRange::gen_range(-5., 5.) * self.intensity_multiplicator,
+                rand::RandomRange::gen_range(-5., 5.) * self.intensity_multiplicator,
+                Color {
+                    r: (rand::RandomRange::gen_range(0.5, 1.)),
+                    g: (rand::RandomRange::gen_range(0.5, 1.)),
+                    b: (rand::RandomRange::gen_range(0.5, 1.)),
+                    a: (0.3),
+                },
+                DrawTextureParams {
+                    dest_size: Some(vec2(screen_width(), screen_height())),
+                    flip_x: false,
+                    flip_y: true,
+                    pivot: None,
+                    source: None,
+                    rotation: (rand::RandomRange::gen_range(-PI / 96., PI / 96.))
+                        * self.intensity_multiplicator,
+                },
+            );
+
+            self.count -= 1;
+        }
+    }
+}
+
 #[macroquad::main("Unglitched")]
 async fn main() {
     let mut world = World::new();
@@ -309,6 +352,11 @@ async fn main() {
 
     // icon_dbg.visible = false;
     // icon_ach.visible = false;
+
+    let mut glitch_effect = Glitch_Effect {
+        count: 0,
+        intensity_multiplicator: 1.,
+    };
 
     loop {
         clear_background(WHITE);
@@ -412,6 +460,20 @@ async fn main() {
                 }
             }
         }
+
+        if is_key_down(KeyCode::Key1) {
+            glitch_effect.set(20, 0.5);
+        }
+
+        if is_key_down(KeyCode::Key2) {
+            glitch_effect.set(20, 2.);
+        }
+
+        if is_key_down(KeyCode::Key3) {
+            glitch_effect.set(20, 4.);
+        }
+
+        glitch_effect.run();
 
         next_frame().await
     }
