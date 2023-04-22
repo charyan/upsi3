@@ -25,6 +25,10 @@ impl Resources {
             .await
             .unwrap();
 
+        let samllbug_sound = load_sound_from_bytes(include_bytes!("../assets/smallbug_sound.wav"))
+            .await
+            .unwrap();
+
         Resources {
             player,
             bullet,
