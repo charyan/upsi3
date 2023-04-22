@@ -373,7 +373,7 @@ fn draw_sprite(
     );
 }
 
-struct GlitchEffect {
+pub struct GlitchEffect {
     count: u32,
     intensity_multiplicator: f32,
     texture: Texture2D,
@@ -544,7 +544,7 @@ async fn main() {
 
     let mut bsod_message = "Overflow on name input".to_owned();
 
-    let mut glitch_effect = GlitchEffect::new();
+    // let mut glitch_effect = GlitchEffect::new();
 
     let mut popup = Popup::new();
     popup.visible = false;
@@ -670,23 +670,23 @@ async fn main() {
 
         if is_key_pressed(KeyCode::Key1) {
             popup.visible = true;
-            glitch_effect.set(10, 0.5);
+            world.glitch_effect.set(10, 0.5);
             popup.style = PopupStyle::INFO;
         }
 
         if is_key_pressed(KeyCode::Key2) {
-            glitch_effect.set(10, 2.);
+            world.glitch_effect.set(10, 2.);
             popup.style = PopupStyle::ERROR;
         }
 
         if is_key_down(KeyCode::Key3) {
             popup.style = PopupStyle::WARNING;
-            glitch_effect.set(10, 4.);
+            world.glitch_effect.set(10, 4.);
         }
 
         popup.draw();
 
-        glitch_effect.run();
+        world.glitch_effect.run();
 
         if game_state == GameState::Game && last_game_state != GameState::Game {
             play_sound(

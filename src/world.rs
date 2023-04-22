@@ -2,7 +2,7 @@ use crate::{
     achievements,
     entities::{self, Entity, EntityType, WORLD_HEIGHT, WORLD_WIDTH},
     resources::{self, Resources},
-    GameState,
+    GameState, GlitchEffect,
 };
 
 use macroquad::{
@@ -34,6 +34,7 @@ pub struct World {
     pub y_direction: i32,
     pub duplicate: Option<Entity>,
     pub has_game_started: bool,
+    pub glitch_effect: GlitchEffect,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -56,6 +57,7 @@ impl World {
             y_direction: 0,
             duplicate: None,
             has_game_started: false,
+            glitch_effect: GlitchEffect::new(),
         }
     }
 
@@ -229,24 +231,30 @@ impl World {
 
         if display_bsod {
             self.bsod(game_state, resources);
+            self.glitch_effect.set(20, 2.)
         }
 
         if self.glitch_frequency_counter == 0 {
             match self.unstabiliy {
                 1 => {
                     self.initialize_glitch(0.01);
+                    self.glitch_effect.set(20, 0.5)
                 }
                 2 => {
                     self.initialize_glitch(0.05);
+                    self.glitch_effect.set(20, 1.)
                 }
                 3 => {
                     self.initialize_glitch(0.07);
+                    self.glitch_effect.set(20, 2.)
                 }
                 4 => {
                     self.initialize_glitch(0.1);
+                    self.glitch_effect.set(20, 4.)
                 }
                 5 => {
                     self.initialize_glitch(1.);
+                    self.glitch_effect.set(20, 8.)
                 }
                 _ => (),
             }
