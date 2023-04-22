@@ -107,7 +107,7 @@ impl World {
             self.player.speed.y -= PLAYER_SPEED;
         }
         if is_key_pressed(KeyCode::Space) {
-            self.power_destroy(&resources, game_state, bsod_message);
+            self.power_destroy(resources, game_state, bsod_message);
         }
 
         self.player.speed *= 0.9;
@@ -157,12 +157,12 @@ impl World {
                     EntityType::HealItem => {
                         if self.hp + 1 > 3 {
                             self.hp = 0;
-                            if self.achievements.achievements[3].unlocked == false {
+                            if self.achievements.achievements[3].unlocked {
+                                to_raise_unstability = true;
+                            } else {
                                 self.achievements.achievements[3].unlock();
                                 *bsod_message = self.achievements.achievements[3].name.to_owned();
                                 display_bsod = true;
-                            } else {
-                                to_raise_unstability = true;
                             }
                         } else {
                             self.hp += 1;
@@ -172,12 +172,12 @@ impl World {
                     &EntityType::ManaItem => {
                         if self.mana + 1 > 3 {
                             self.mana = 0;
-                            if self.achievements.achievements[5].unlocked == false {
+                            if self.achievements.achievements[5].unlocked {
+                                to_raise_unstability = true;
+                            } else {
                                 self.achievements.achievements[5].unlock();
                                 *bsod_message = self.achievements.achievements[5].name.to_owned();
                                 display_bsod = true;
-                            } else {
-                                to_raise_unstability = true;
                             }
                         } else {
                             self.mana += 1;
@@ -190,13 +190,13 @@ impl World {
         }
 
         if self.player.pos.y < -2. {
-            if self.achievements.achievements[6].unlocked == false {
+            if self.achievements.achievements[6].unlocked {
+                to_raise_unstability = true;
+                self.player.pos = entities::CENTER;
+            } else {
                 self.achievements.achievements[6].unlock();
                 *bsod_message = self.achievements.achievements[6].name.to_owned();
                 display_bsod = true;
-            } else {
-                to_raise_unstability = true;
-                self.player.pos = entities::CENTER;
             }
         }
 
@@ -252,7 +252,7 @@ impl World {
             }
         } else {
             if let Some(to_duplicate) = &mut self.duplicate {
-                to_duplicate.tick(self.player.pos.clone());
+                to_duplicate.tick(self.player.pos);
             }
             if let Some(to_duplicate) = &self.duplicate {
                 if self.glitch_frequency_counter % GLITCH_SPEED == 0 {
@@ -270,12 +270,11 @@ impl World {
 
     pub fn glitch(
         &mut self,
-        duplicate: Entity,
+        mut clone: Entity,
         x_direction: i32,
         y_direction: i32,
         resources: &Resources,
     ) {
-        let mut clone = duplicate.clone();
         if y_direction < 0 {
             clone.pos.y -= 0.3;
         } else {
@@ -356,13 +355,13 @@ impl World {
             } else if self.mana == 0 {
                 self.mana = 2;
             }
-            if self.achievements.achievements[4].unlocked == false {
+            if self.achievements.achievements[4].unlocked {
+                self.raise_unstability();
+            } else {
                 self.achievements.achievements[4].unlock();
                 *bsod_message = self.achievements.achievements[4].name.to_owned();
                 *game_state = GameState::BSOD;
-                play_sound(resources.bsod_sound, PlaySoundParams::default())
-            } else {
-                self.raise_unstability();
+                play_sound(resources.bsod_sound, PlaySoundParams::default());
             }
         }
     }

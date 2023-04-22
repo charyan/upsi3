@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic, clippy::nursery)]
+
 pub mod achievements;
 pub mod entities;
 pub mod resources;
@@ -7,6 +9,7 @@ use std::{f32::consts::PI, u8};
 
 use achievements::Achievements;
 use entities::{EntityType, WORLD_WIDTH};
+use macroquad::audio::stop_sound;
 use macroquad::ui::{hash, root_ui, widgets, Skin};
 use macroquad::{
     audio::{play_sound, PlaySoundParams},
@@ -17,6 +20,7 @@ use world::World;
 
 const TITLE_BAR_HEIGHT: f32 = 60.;
 
+#[derive(Clone, PartialEq, Eq)]
 pub enum GameState {
     Desktop,
     Game,
@@ -76,18 +80,18 @@ impl UIElement {
     }
 }
 
-enum Popup_Style {
+enum PopupStyle {
     INFO,
     WARNING,
     ERROR,
 }
 
-impl Popup_Style {
-    pub fn getName(&self) -> &str {
+impl PopupStyle {
+    pub fn get_name(&self) -> &str {
         match self {
-            Popup_Style::ERROR => "Error",
-            Popup_Style::WARNING => "Warning",
-            Popup_Style::INFO => "Info",
+            PopupStyle::ERROR => "Error",
+            PopupStyle::WARNING => "Warning",
+            PopupStyle::INFO => "Info",
         }
     }
 }
@@ -97,7 +101,7 @@ struct Popup {
     pub position: Vec2,
     pub width: f32,
     pub height: f32,
-    pub style: Popup_Style,
+    pub style: PopupStyle,
     pub visible: bool,
     pub text: &'static str,
 }
@@ -113,7 +117,7 @@ impl Popup {
             position: vec2(screen_width() / 2. - 300., screen_height() / 2. - 200.),
             width: 600.,
             height: 400.,
-            style: Popup_Style::INFO,
+            style: PopupStyle::INFO,
             visible: true,
             text: "Some text here",
         }
@@ -156,21 +160,21 @@ impl Popup {
                 self.width,
                 TITLE_BAR_HEIGHT,
                 match self.style {
-                    Popup_Style::ERROR => RED,
-                    Popup_Style::INFO => DARKBLUE,
-                    Popup_Style::WARNING => ORANGE,
+                    PopupStyle::ERROR => RED,
+                    PopupStyle::INFO => DARKBLUE,
+                    PopupStyle::WARNING => ORANGE,
                 },
             );
 
             draw_text(
-                self.style.getName(),
+                self.style.get_name(),
                 self.position.x + 20.,
                 self.position.y + TITLE_BAR_HEIGHT / 2. + 5.,
                 40.,
                 match self.style {
-                    Popup_Style::ERROR => WHITE,
-                    Popup_Style::INFO => WHITE,
-                    Popup_Style::WARNING => BLACK,
+                    PopupStyle::ERROR => WHITE,
+                    PopupStyle::INFO => WHITE,
+                    PopupStyle::WARNING => BLACK,
                 },
             );
 
@@ -213,7 +217,7 @@ fn window_decorations(state: &mut GameState, cross: &mut UIElement, title: &str)
     }
 }
 
-fn draw_bsod_text(message: String) {
+fn draw_bsod_text(message: &str) {
     let mut y = 30.;
     let y_diff = 30.;
     let font_size_bsod = 30.;
@@ -437,9 +441,27 @@ fn draw_game(world: &World, resources: &Resources) {
 
     for enemy in &world.enemies {
         let texture = match enemy.e_type {
-            EntityType::Bullet => resources.bullet,
-            EntityType::Follower => resources.follower,
-            EntityType::Pather(_) => resources.pather,
+            EntityType::Bullet => {
+                if enemy.is_clone {
+                    resources.bullet_glitch
+                } else {
+                    resources.bullet
+                }
+            }
+            EntityType::Follower => {
+                if enemy.is_clone {
+                    resources.follower_glitch
+                } else {
+                    resources.follower
+                }
+            }
+            EntityType::Pather(_) => {
+                if enemy.is_clone {
+                    resources.pather_glitch
+                } else {
+                    resources.pather
+                }
+            }
             _ => unreachable!(),
         };
 
@@ -503,6 +525,7 @@ async fn main() {
     );
 
     let mut game_state = GameState::Desktop;
+    let mut last_game_state = game_state.clone();
 
     let mut bsod_message = "Overflow on name input".to_owned();
 
@@ -561,7 +584,7 @@ async fn main() {
                         game_state = GameState::BSOD;
                     }
                 } else {
-                    popup.style = Popup_Style::INFO;
+                    popup.style = PopupStyle::INFO;
                     popup.text = "Enter your name (max 8 char)";
 
                     if !popup.visible {
@@ -625,7 +648,7 @@ async fn main() {
 
                 draw_rectangle(0., 0., screen_width(), screen_height(), DARKBLUE);
 
-                draw_bsod_text(bsod_message.to_string());
+                draw_bsod_text(&bsod_message);
 
                 if is_key_pressed(KeyCode::Enter) {
                     game_state = GameState::Desktop;
@@ -636,16 +659,16 @@ async fn main() {
         if is_key_pressed(KeyCode::Key1) {
             popup.visible = true;
             glitch_effect.set(10, 0.5);
-            popup.style = Popup_Style::INFO;
+            popup.style = PopupStyle::INFO;
         }
 
         if is_key_pressed(KeyCode::Key2) {
             glitch_effect.set(10, 2.);
-            popup.style = Popup_Style::ERROR;
+            popup.style = PopupStyle::ERROR;
         }
 
         if is_key_pressed(KeyCode::Key3) {
-            popup.style = Popup_Style::WARNING;
+            popup.style = PopupStyle::WARNING;
             glitch_effect.set(10, 4.);
         }
 
@@ -653,6 +676,20 @@ async fn main() {
 
         glitch_effect.run();
 
-        next_frame().await
+        if game_state == GameState::Game && last_game_state != GameState::Game {
+            play_sound(
+                resources.music,
+                PlaySoundParams {
+                    looped: true,
+                    volume: 0.1,
+                },
+            );
+        } else if game_state != GameState::Game && last_game_state == GameState::Game {
+            stop_sound(resources.music);
+        }
+
+        last_game_state = game_state.clone();
+
+        next_frame().await;
     }
 }
