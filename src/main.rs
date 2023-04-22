@@ -3,7 +3,7 @@ pub mod entities;
 pub mod resources;
 pub mod world;
 
-use std::f32::consts::PI;
+use std::{f32::consts::PI, u8};
 
 use achievements::Achievements;
 use entities::{EntityType, WORLD_WIDTH};
@@ -33,10 +33,10 @@ struct UIElement {
 
 impl UIElement {
     pub fn new(position: Vec2, draw_dst: Vec2, bytes: &[u8]) -> Self {
-        let texture = Texture2D::from_file_with_format(bytes, None);
-        texture.set_filter(FilterMode::Nearest);
+        let t = Texture2D::from_file_with_format(bytes, None);
+        t.set_filter(FilterMode::Nearest);
         UIElement {
-            texture,
+            texture: t,
             position,
             draw_dst,
             visible: true,
@@ -72,6 +72,122 @@ impl UIElement {
             x_collide && y_collide
         } else {
             false
+        }
+    }
+}
+
+enum Popup_Style {
+    INFO,
+    WARNING,
+    ERROR,
+}
+
+impl Popup_Style {
+    pub fn getName(&self) -> &str {
+        match self {
+            Popup_Style::ERROR => "Error",
+            Popup_Style::WARNING => "Warning",
+            Popup_Style::INFO => "Info",
+        }
+    }
+}
+
+struct Popup {
+    pub button: UIElement,
+    pub position: Vec2,
+    pub width: f32,
+    pub height: f32,
+    pub style: Popup_Style,
+    pub visible: bool,
+}
+
+impl Popup {
+    pub fn new() -> Popup {
+        Popup {
+            button: UIElement::new(
+                vec2(screen_width() / 2. - 100., screen_height() / 2. + 100.),
+                vec2(200., 80.),
+                include_bytes!("../assets/images/btn_ok.png"),
+            ),
+            position: vec2(screen_width() / 2. - 300., screen_height() / 2. - 200.),
+            width: 600.,
+            height: 400.,
+            style: Popup_Style::INFO,
+            visible: true,
+        }
+    }
+
+    pub fn draw(&mut self) {
+        if self.visible {
+            draw_rectangle(
+                0.,
+                0.,
+                screen_width(),
+                screen_height(),
+                Color {
+                    r: 0.,
+                    g: 0.,
+                    b: 0.,
+                    a: 0.5,
+                },
+            );
+
+            draw_rectangle(
+                self.position.x - 10.,
+                self.position.y - 10.,
+                self.width + 20.,
+                self.height + 20.,
+                BLACK,
+            );
+
+            draw_rectangle(
+                self.position.x,
+                self.position.y,
+                self.width,
+                self.height,
+                WHITE,
+            );
+
+            draw_rectangle(
+                self.position.x,
+                self.position.y,
+                self.width,
+                TITLE_BAR_HEIGHT,
+                match self.style {
+                    Popup_Style::ERROR => RED,
+                    Popup_Style::INFO => DARKBLUE,
+                    Popup_Style::WARNING => ORANGE,
+                },
+            );
+
+            draw_text(
+                self.style.getName(),
+                self.position.x + 20.,
+                self.position.y + TITLE_BAR_HEIGHT / 2. + 5.,
+                40.,
+                match self.style {
+                    Popup_Style::ERROR => WHITE,
+                    Popup_Style::INFO => WHITE,
+                    Popup_Style::WARNING => BLACK,
+                },
+            );
+
+            draw_text(
+                "Some text here",
+                self.position.x + 20.,
+                self.position.y + TITLE_BAR_HEIGHT + 50.,
+                30.,
+                BLACK,
+            );
+
+            self.button.draw();
+
+            let (mouse_x, mouse_y) = mouse_position();
+            if is_mouse_button_pressed(MouseButton::Left)
+                && self.button.collide(Vec2::new(mouse_x, mouse_y))
+            {
+                self.visible = false;
+            }
         }
     }
 }
@@ -371,6 +487,8 @@ async fn main() {
         intensity_multiplicator: 1.,
     };
 
+    let mut popup = Popup::new();
+
     loop {
         clear_background(BLACK);
         wallpaper.draw_dst = vec2(screen_width(), screen_height());
@@ -382,23 +500,25 @@ async fn main() {
                 icon_dbg.draw();
                 icon_ach.draw();
 
-                let (mouse_x, mouse_y) = mouse_position();
-                if is_mouse_button_pressed(MouseButton::Left)
-                    && icon_ung.collide(Vec2::new(mouse_x, mouse_y))
-                {
-                    game_state = GameState::Game;
-                }
+                if !popup.visible {
+                    let (mouse_x, mouse_y) = mouse_position();
+                    if is_mouse_button_pressed(MouseButton::Left)
+                        && icon_ung.collide(Vec2::new(mouse_x, mouse_y))
+                    {
+                        game_state = GameState::Game;
+                    }
 
-                if is_mouse_button_pressed(MouseButton::Left)
-                    && icon_ach.collide(Vec2::new(mouse_x, mouse_y))
-                {
-                    game_state = GameState::Achievements;
-                }
+                    if is_mouse_button_pressed(MouseButton::Left)
+                        && icon_ach.collide(Vec2::new(mouse_x, mouse_y))
+                    {
+                        game_state = GameState::Achievements;
+                    }
 
-                if is_mouse_button_pressed(MouseButton::Left)
-                    && icon_dbg.collide(Vec2::new(mouse_x, mouse_y))
-                {
-                    game_state = GameState::DebugGame;
+                    if is_mouse_button_pressed(MouseButton::Left)
+                        && icon_dbg.collide(Vec2::new(mouse_x, mouse_y))
+                    {
+                        game_state = GameState::DebugGame;
+                    }
                 }
             }
 
@@ -475,17 +595,22 @@ async fn main() {
         }
 
         if is_key_down(KeyCode::Key1) {
-            glitch_effect.set(20, 0.5);
+            popup.visible = true;
+            glitch_effect.set(10, 0.5);
+            popup.style = Popup_Style::INFO;
         }
 
         if is_key_down(KeyCode::Key2) {
-            glitch_effect.set(20, 2.);
+            glitch_effect.set(10, 2.);
+            popup.style = Popup_Style::ERROR;
         }
 
         if is_key_down(KeyCode::Key3) {
-            glitch_effect.set(20, 4.);
+            popup.style = Popup_Style::WARNING;
+            glitch_effect.set(10, 4.);
         }
 
+        popup.draw();
         glitch_effect.run();
 
         next_frame().await
