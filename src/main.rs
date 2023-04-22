@@ -3,8 +3,13 @@ pub mod entities;
 pub mod resources;
 pub mod world;
 
+use std::default;
+
 use achievements::Achievements;
-use macroquad::prelude::*;
+use macroquad::{
+    audio::{play_sound, PlaySoundParams},
+    prelude::*,
+};
 use resources::Resources;
 use world::World;
 
@@ -219,7 +224,9 @@ fn draw_game(world: &World, resources: &Resources) {
 async fn main() {
     let mut world = World::new();
 
-    let resources = Resources::load();
+    let resources = Resources::load().await;
+
+    play_sound(resources.bsod_sound, PlaySoundParams::default());
 
     let mut wallpaper = UIElement::new(
         vec2(0., 0.),
