@@ -373,6 +373,33 @@ fn draw_sprite(
     );
 }
 
+fn draw_ui(texture: Texture2D, mut pos: Vec2, mut radius: f32, screen_width: f32, rotation: f32) {
+    let scale = screen_width / WORLD_WIDTH;
+
+    pos -= Vec2::new(radius, radius);
+
+    pos *= scale;
+
+    pos.y += TITLE_BAR_HEIGHT;
+
+    radius *= scale;
+
+    draw_texture_ex(
+        texture,
+        pos.x,
+        pos.y,
+        WHITE,
+        DrawTextureParams {
+            dest_size: Some(Vec2::new(radius * 2., radius * 2.)),
+            source: None,
+            rotation,
+            flip_x: false,
+            flip_y: false,
+            pivot: None,
+        },
+    );
+}
+
 pub struct GlitchEffect {
     count: u32,
     intensity_multiplicator: f32,
@@ -503,6 +530,26 @@ fn draw_game(world: &World, resources: &Resources) {
             item.radius,
             screen_width(),
             item.rotation,
+        );
+    }
+
+    for i in 0..world.hp {
+        draw_ui(
+            resources.heart,
+            Vec2::new(1. + i as f32 * 0.8, 1.),
+            0.3,
+            screen_width(),
+            0.,
+        );
+    }
+
+    for i in 0..world.mana {
+        draw_ui(
+            resources.energy,
+            Vec2::new(4. + i as f32 * 0.8, 1.),
+            0.3,
+            screen_width(),
+            0.,
         );
     }
 }
