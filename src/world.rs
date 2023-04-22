@@ -74,7 +74,7 @@ impl World {
         if is_key_down(KeyCode::W) {
             self.player.speed.y -= PLAYER_SPEED;
         }
-        if is_key_down(KeyCode::Space) {
+        if is_key_pressed(KeyCode::Space) {
             self.power_destroy(&resources);
         }
 
@@ -130,6 +130,15 @@ impl World {
         for b in &mut self.enemies {
             if (b.pos - self.player.pos).length() < (self.player.radius + DESTROY_RANGE) {
                 b.alive = false;
+            }
+        }
+        if let Some(new_mana) = self.mana.checked_sub(2) {
+            self.mana = new_mana;
+        } else {
+            if self.mana == 1 {
+                self.mana = 3;
+            } else if self.mana == 0 {
+                self.mana = 2;
             }
         }
     }
