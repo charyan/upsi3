@@ -14,6 +14,7 @@ const DESTROY_RANGE: f32 = 10.;
 const BULLET_SPAWN_TIME: u32 = 60;
 const FOLLOWER_SPAWN_TIME: u32 = 200;
 const PATH_SPAWN_TIME: u32 = 150;
+const INSTABILITY_UP: u32 = 1;
 
 pub struct World {
     pub player: Entity,
@@ -102,7 +103,7 @@ impl World {
                         self.achievements.achievements[2].unlock();
                         *game_state = GameState::BSOD;
                     } else {
-                        self.unstabiliy += 20;
+                        self.unstabiliy += INSTABILITY_UP;
                     }
                 }
                 b.alive = false;
@@ -120,7 +121,7 @@ impl World {
                                 self.achievements.achievements[3].unlock();
                                 *game_state = GameState::BSOD;
                             } else {
-                                self.unstabiliy += 20;
+                                self.unstabiliy += INSTABILITY_UP;
                             }
                         } else {
                             self.hp += 1;
@@ -134,7 +135,7 @@ impl World {
                                 self.achievements.achievements[5].unlock();
                                 *game_state = GameState::BSOD;
                             } else {
-                                self.unstabiliy += 20;
+                                self.unstabiliy += INSTABILITY_UP;
                             }
                         } else {
                             self.mana += 1;
@@ -151,7 +152,7 @@ impl World {
                 self.achievements.achievements[6].unlock();
                 *game_state = GameState::BSOD;
             } else {
-                self.unstabiliy += 20;
+                self.unstabiliy += INSTABILITY_UP;
             }
         }
 
@@ -179,7 +180,7 @@ impl World {
                 self.achievements.achievements[4].unlock();
                 *game_state = GameState::BSOD;
             } else {
-                self.unstabiliy += 20;
+                self.unstabiliy += INSTABILITY_UP;
             }
         }
     }
