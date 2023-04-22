@@ -33,6 +33,7 @@ pub struct World {
     pub x_direction: i32,
     pub y_direction: i32,
     pub duplicate: Option<Entity>,
+    pub has_game_started: bool,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -54,6 +55,7 @@ impl World {
             x_direction: 0,
             y_direction: 0,
             duplicate: None,
+            has_game_started: false,
         }
     }
 
@@ -116,6 +118,8 @@ impl World {
         for b in &mut self.enemies {
             b.tick(self.player.pos);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
+                self.player.hit_anim = 10;
+
                 play_sound(
                     resources.hit_sound,
                     PlaySoundParams {
@@ -165,7 +169,7 @@ impl World {
                     }
 
                     &EntityType::ManaItem => {
-                        if self.mana + 1 > 4 {
+                        if self.mana + 1 > 3 {
                             self.mana = 0;
                             if self.achievements.achievements[5].unlocked == false {
                                 self.achievements.achievements[5].unlock();
