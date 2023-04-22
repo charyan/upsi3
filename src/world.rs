@@ -8,7 +8,7 @@ pub struct World {
     pub player: Entity,
     pub ennemies: Vec<Entity>,
     pub items: Vec<Entity>,
-    pub HP: u8,
+    pub hp: u8,
     pub mana: u8,
 }
 
@@ -18,7 +18,7 @@ impl World {
             player: Entity::new_player(),
             ennemies: Vec::new(),
             items: Vec::new(),
-            HP: 3,
+            hp: 3,
             mana: 4,
         }
     }
@@ -29,10 +29,10 @@ impl World {
         for b in &mut self.ennemies {
             b.tick(Vec2::ZERO);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
-                if let Some(newHp) = self.HP.checked_sub(1) {
-                    self.HP = newHp;
+                if let Some(newHp) = self.hp.checked_sub(1) {
+                    self.hp = newHp;
                 } else {
-                    self.HP = 3;
+                    self.hp = 3;
                 }
             }
         }
@@ -41,10 +41,10 @@ impl World {
             if (i.pos - self.player.pos).length() < (self.player.radius + i.radius) {
                 match &i.e_type {
                     EntityType::HealItem => {
-                        if self.HP + 1 > 3 {
-                            self.HP = 0;
+                        if self.hp + 1 > 3 {
+                            self.hp = 0;
                         } else {
-                            self.HP += 1;
+                            self.hp += 1;
                         }
                         i.alive = false;
                     }
