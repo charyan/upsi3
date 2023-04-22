@@ -6,15 +6,17 @@ pub enum EntityType {
     Bullet,                 // Red circle
     Follower,               // Blue triangle
     Pather(VecDeque<Vec2>), // Green square
-    Player(u8),             // The player
+    Player(u8, u8),         // The player
+    HealItem,               // Hearth that heals the player
+    ManaItem,               // blue circle that give mana to player
 }
 
 pub struct Entity {
-    pos: Vec2,
-    speed: Vec2,
-    e_type: EntityType,
-    radius: f32,
-    alive: bool,
+    pub pos: Vec2,
+    pub speed: Vec2,
+    pub e_type: EntityType,
+    pub radius: f32,
+    pub alive: bool,
 }
 
 const SPAWN_DIST: f32 = 42.;
@@ -43,7 +45,7 @@ impl Entity {
         Self {
             pos: CENTER,
             speed: Vec2::ZERO,
-            e_type: EntityType::Player(3),
+            e_type: EntityType::Player(3, 4),
             radius: 2.,
             alive: true,
         }
@@ -94,17 +96,38 @@ impl Entity {
         }
     }
 
+    pub fn new_heal_item() -> Self {
+        let pos: Vec2 = random_inside_pos();
+
+        Self {
+            pos,
+            speed: Vec2::ZERO,
+            e_type: EntityType::HealItem,
+            radius: 1.,
+            alive: true,
+        }
+    }
+
     pub fn tick(&mut self, target_pos: Vec2) {
         match &mut self.e_type {
             EntityType::Bullet => self.bullet_tick(),
             EntityType::Follower => self.follower_tick(target_pos),
             EntityType::Pather(_) => self.pather_tick(),
-            EntityType::Player(_) => self.player_tick(),
+            EntityType::Player(_, _) => self.player_tick(),
+            EntityType::HealItem => (),
+            EntityType::ManaItem => (),
         }
     }
 
     fn player_tick(&mut self) {
-        self.pos += self.speed;
+        if (self.pos + self.speed).x > WORLD_WIDTH
+            || (self.pos + self.speed).y > WORLD_HEIGHT
+            || (self.pos + self.speed).x < 0.
+        {
+            self.pos = self.pos;
+        } else {
+            self.pos += self.speed;
+        }
     }
 
     fn bullet_tick(&mut self) {
@@ -133,7 +156,7 @@ impl Entity {
 
         if let Some(point) = path.front() {
             self.speed = (*point - self.pos).normalize() * PATHER_SPEED;
-            if (self.pos - *point).length() < 2. {
+            if (self.pos - *point).length() < self.radius + 1. {
                 path.pop_front().unwrap();
             }
         } else {
