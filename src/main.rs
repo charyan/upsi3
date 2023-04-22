@@ -98,7 +98,7 @@ fn draw_bsod_text(message: String) {
     y += y_diff;
     draw_text("", 50., y, font_size_bsod, WHITE);
     y += y_diff;
-    draw_text(&format!("{}", message), 50., y, font_size_bsod, WHITE);
+    draw_text(&format!("{}", message), 50., y, font_size_bsod * 1.5, WHITE);
     y += y_diff;
     draw_text("", 50., y, font_size_bsod, WHITE);
     y += y_diff;
@@ -308,6 +308,29 @@ async fn main() {
             }
 
             GameState::DebugGame => {
+                let dbg_pos = vec2(screen_width() * 2. / 3., TITLE_BAR_HEIGHT);
+                let mut list_pos = vec2(dbg_pos.x + 20., dbg_pos.y + 40.);
+                let list_font_size = 40.;
+
+                draw_rectangle(
+                    dbg_pos.x,
+                    dbg_pos.y,
+                    screen_width() / 3.,
+                    screen_height() - TITLE_BAR_HEIGHT,
+                    DARKGRAY,
+                );
+
+                let debug_list = vec![
+                    format!("mouse_pos_x: {}", mouse_position().0),
+                    format!("mouse_pos_y: {}", mouse_position().1),
+                ];
+
+                for item in debug_list {
+                    draw_text(&item, list_pos.x, list_pos.y, list_font_size, WHITE);
+
+                    list_pos.y += list_font_size;
+                }
+
                 window_decorations(&mut game_state, &mut cross, "Unglitched (Debug mode)");
             }
 

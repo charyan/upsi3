@@ -1,5 +1,3 @@
-use std::arch::x86_64::_SIDD_NEGATIVE_POLARITY;
-
 use crate::entities::{Entity, EntityType};
 
 use macroquad::prelude::*;
