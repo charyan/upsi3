@@ -45,11 +45,6 @@ impl Achievements {
                     "up",
                     "Leave the map",
                 ),
-                Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
-                    "reload_anyway",
-                    "Restart loading by",
-                ),
             ],
         }
     }

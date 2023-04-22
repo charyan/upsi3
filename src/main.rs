@@ -7,10 +7,9 @@ pub mod world;
 
 use std::{f32::consts::PI, u8};
 
-use achievements::Achievements;
 use entities::{EntityType, WORLD_WIDTH};
 use macroquad::audio::stop_sound;
-use macroquad::ui::{hash, root_ui, widgets, Skin};
+use macroquad::ui::{hash, root_ui, Skin};
 use macroquad::{
     audio::{play_sound, PlaySoundParams},
     prelude::*,
@@ -374,15 +373,15 @@ fn draw_sprite(
     );
 }
 
-struct Glitch_Effect {
+struct GlitchEffect {
     count: u32,
     intensity_multiplicator: f32,
     texture: Option<Texture2D>,
 }
 
-impl Glitch_Effect {
-    pub fn new() -> Glitch_Effect {
-        Glitch_Effect {
+impl GlitchEffect {
+    pub fn new() -> GlitchEffect {
+        GlitchEffect {
             count: 0,
             intensity_multiplicator: 1.,
             texture: None,
@@ -498,7 +497,6 @@ async fn main() {
     let resources = Resources::load().await;
 
     let mut input_text = String::new();
-    let mut enable_input = true;
 
     let mut wallpaper = UIElement::new(
         vec2(0., 0.),
@@ -529,7 +527,7 @@ async fn main() {
 
     let mut bsod_message = "Overflow on name input".to_owned();
 
-    let mut glitch_effect = Glitch_Effect::new();
+    let mut glitch_effect = GlitchEffect::new();
 
     let mut popup = Popup::new();
     popup.visible = false;
@@ -564,7 +562,6 @@ async fn main() {
                     {
                         game_state = GameState::Game;
                         popup.visible = true;
-                        enable_input = true;
                     }
 
                     if is_mouse_button_pressed(MouseButton::Left)
@@ -589,7 +586,6 @@ async fn main() {
 
                     if !popup.visible {
                         world.has_game_started = true;
-                        enable_input = false;
 
                         if world.achievements.achievements[0].unlocked {
                             world.raise_unstability();
@@ -625,7 +621,7 @@ async fn main() {
 
                 let mut cl_ach = world.achievements.clone();
 
-                let n_ele_col = cl_ach.achievements.len() / 2;
+                let n_ele_col = (cl_ach.achievements.len() + 1) / 2;
 
                 for ach in &mut cl_ach.achievements[..n_ele_col] {
                     ach.draw(vec2(ach_x, ach_y));
@@ -644,7 +640,6 @@ async fn main() {
 
             GameState::BSOD => {
                 popup.visible = false;
-                enable_input = false;
 
                 draw_rectangle(0., 0., screen_width(), screen_height(), DARKBLUE);
 
