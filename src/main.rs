@@ -246,24 +246,6 @@ fn draw_sprite(texture: Texture2D, mut pos: Vec2, mut radius: f32, screen_width:
     );
 }
 
-fn draw_game(world: &World, resources: &Resources) {
-    let player_pos = world.player.pos;
-    let player_radius = world.player.radius;
-
-    draw_sprite(resources.player, player_pos, player_radius, screen_width());
-
-    for enemy in &world.enemies {
-        let texture = match &enemy.e_type {
-            EntityType::Bullet => resources.bullet,
-            EntityType::Follower => todo!(),
-            EntityType::Pather(_) => todo!(),
-            _ => unreachable!(),
-        };
-
-        draw_sprite(texture, enemy.pos, enemy.radius, screen_width());
-    }
-}
-
 struct Glitch_Effect {
     count: u32,
     intensity_multiplicator: f32,
@@ -305,7 +287,7 @@ impl Glitch_Effect {
     }
 }
 
-#[macroquad::main("Unglitched")]
+#[macroquad::main("BasicShapes")]
 async fn main() {
     let mut world = World::new();
 
