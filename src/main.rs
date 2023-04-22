@@ -573,9 +573,22 @@ async fn main() {
                         game_state = GameState::BSOD;
                     }
                 } else {
+                    popup.style = Popup_Style::INFO;
                     popup.text = "Enter your name (max 8 char)";
-                }
 
+                    if !popup.visible {
+                        world.has_game_started = true;
+                        enable_input = false;
+
+                        if world.achievements.achievements[0].unlocked {
+                            world.raise_unstability();
+                        } else if input_text.len() > 8 {
+                            world.achievements.achievements[0].unlock();
+                            bsod_message = world.achievements.achievements[0].name.to_string();
+                            game_state = GameState::BSOD;
+                        }
+                    }
+                }
                 if popup.visible {
                     world.has_game_started = false;
 
@@ -590,17 +603,6 @@ async fn main() {
                     );
                     // root_ui().pop_skin();
                     // root_ui().close_current_window();
-                } else {
-                    world.has_game_started = true;
-                    enable_input = false;
-
-                    if world.achievements.achievements[0].unlocked {
-                        // TODO: Raise instability
-                    } else if input_text.len() > 8 {
-                        world.achievements.achievements[0].unlock();
-                        bsod_message = world.achievements.achievements[0].name.to_string();
-                        game_state = GameState::BSOD;
-                    }
                 }
 
                 window_decorations(&mut game_state, &mut cross, "Unglitched");
