@@ -373,20 +373,28 @@ fn draw_sprite(
 struct Glitch_Effect {
     count: u32,
     intensity_multiplicator: f32,
+    texture: Option<Texture2D>,
 }
 
 impl Glitch_Effect {
+    pub fn new() -> Glitch_Effect {
+        Glitch_Effect {
+            count: 0,
+            intensity_multiplicator: 1.,
+            texture: None,
+        }
+    }
+
     pub fn set(&mut self, count: u32, intensity_multiplicator: f32) {
         self.count = count;
         self.intensity_multiplicator = intensity_multiplicator;
+        self.texture = Some(Texture2D::from_image(&get_screen_data()));
     }
 
     pub fn run(&mut self) {
         if self.count > 0 {
-            let mut t = Texture2D::from_image(&get_screen_data());
-
             draw_texture_ex(
-                t,
+                self.texture.unwrap(),
                 rand::RandomRange::gen_range(-5., 5.) * self.intensity_multiplicator,
                 rand::RandomRange::gen_range(-5., 5.) * self.intensity_multiplicator,
                 Color {
@@ -498,10 +506,7 @@ async fn main() {
 
     let mut bsod_message = "Overflow on name input".to_owned();
 
-    let mut glitch_effect = Glitch_Effect {
-        count: 0,
-        intensity_multiplicator: 1.,
-    };
+    let mut glitch_effect = Glitch_Effect::new();
 
     let mut popup = Popup::new();
     popup.visible = false;
@@ -628,18 +633,18 @@ async fn main() {
             }
         }
 
-        if is_key_down(KeyCode::Key1) {
+        if is_key_pressed(KeyCode::Key1) {
             popup.visible = true;
             glitch_effect.set(10, 0.5);
             popup.style = Popup_Style::INFO;
         }
 
-        if is_key_down(KeyCode::Key2) {
+        if is_key_pressed(KeyCode::Key2) {
             glitch_effect.set(10, 2.);
             popup.style = Popup_Style::ERROR;
         }
 
-        if is_key_down(KeyCode::Key3) {
+        if is_key_pressed(KeyCode::Key3) {
             popup.style = Popup_Style::WARNING;
             glitch_effect.set(10, 4.);
         }
