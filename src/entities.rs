@@ -1,4 +1,7 @@
-use std::{collections::VecDeque, f32::consts::TAU};
+use std::{
+    collections::VecDeque,
+    f32::consts::{PI, TAU},
+};
 
 use macroquad::prelude::*;
 
@@ -17,6 +20,7 @@ pub struct Entity {
     pub e_type: EntityType,
     pub radius: f32,
     pub alive: bool,
+    pub rotation: f32,
 }
 
 const SPAWN_DIST: f32 = 42.;
@@ -48,6 +52,7 @@ impl Entity {
             e_type: EntityType::Player,
             radius: 1.,
             alive: true,
+            rotation: PI / 2.,
         }
     }
 
@@ -61,6 +66,7 @@ impl Entity {
             e_type: EntityType::Bullet,
             radius: 0.5,
             alive: true,
+            rotation: 0.,
         }
     }
 
@@ -74,6 +80,7 @@ impl Entity {
             e_type: EntityType::Follower,
             radius: 0.5,
             alive: true,
+            rotation: speed.y.atan2(speed.x),
         }
     }
 
@@ -93,6 +100,7 @@ impl Entity {
             e_type: EntityType::Pather(path),
             radius: 0.5,
             alive: true,
+            rotation: 0.,
         }
     }
 
@@ -105,6 +113,20 @@ impl Entity {
             e_type: EntityType::HealItem,
             radius: 0.5,
             alive: true,
+            rotation: PI / 2.,
+        }
+    }
+
+    pub fn new_mana_item() -> Self {
+        let pos: Vec2 = random_inside_pos();
+
+        Self {
+            pos,
+            speed: Vec2::ZERO,
+            e_type: EntityType::ManaItem,
+            radius: 0.5,
+            alive: true,
+            rotation: PI / 2.,
         }
     }
 
@@ -122,6 +144,7 @@ impl Entity {
     fn player_tick(&mut self) {
         self.pos += self.speed;
         self.speed *= 0.9;
+        self.rotation = self.speed.y.atan2(self.speed.x);
 
         if self.pos.x - self.radius < 0. {
             self.pos.x = self.radius;
@@ -143,6 +166,7 @@ impl Entity {
 
     fn follower_tick(&mut self, target_pos: Vec2) {
         self.speed = (target_pos - self.pos).normalize() * FOLLOWER_SPEED;
+        self.rotation = self.speed.y.atan2(self.speed.x);
         self.radius -= 0.1;
         if self.radius < 0. {
             self.alive = false;
