@@ -1,13 +1,15 @@
-use std::arch::x86_64::_SIDD_NEGATIVE_POLARITY;
-
 use crate::entities::{Entity, EntityType};
 
 use macroquad::prelude::*;
+
+const DESTROY_RANGE: f32 = 10.;
 
 pub struct World {
     pub player: Entity,
     pub ennemies: Vec<Entity>,
     pub items: Vec<Entity>,
+    pub HP: u8,
+    pub mana: u8,
 }
 
 impl World {
@@ -16,24 +18,21 @@ impl World {
             player: Entity::new_player(),
             ennemies: Vec::new(),
             items: Vec::new(),
+            HP: 3,
+            mana: 4,
         }
     }
 
     pub fn tick(&mut self) {
         self.player.tick(Vec2::ZERO);
-        let (HP, mana) = if let EntityType::Player(HP, mana) = &mut self.player.e_type {
-            (HP, mana)
-        } else {
-            unreachable!()
-        };
 
         for b in &mut self.ennemies {
             b.tick(Vec2::ZERO);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
-                if let Some(newHp) = HP.checked_sub(1) {
-                    *HP = newHp;
+                if let Some(newHp) = self.HP.checked_sub(1) {
+                    self.HP = newHp;
                 } else {
-                    *HP = 3;
+                    self.HP = 3;
                 }
             }
         }
@@ -42,19 +41,19 @@ impl World {
             if (i.pos - self.player.pos).length() < (self.player.radius + i.radius) {
                 match &i.e_type {
                     EntityType::HealItem => {
-                        if *HP + 1 > 3 {
-                            *HP = 0;
+                        if self.HP + 1 > 3 {
+                            self.HP = 0;
                         } else {
-                            *HP += 1;
+                            self.HP += 1;
                         }
                         i.alive = false;
                     }
 
                     &EntityType::ManaItem => {
-                        if *mana + 1 > 4 {
-                            *mana = 0;
+                        if self.mana + 1 > 4 {
+                            self.mana = 0;
                         } else {
-                            *mana += 1;
+                            self.mana += 1;
                         }
                         i.alive = false;
                     }
@@ -65,5 +64,13 @@ impl World {
 
         self.ennemies.retain(|e| e.alive);
         self.items.retain(|e| e.alive);
+    }
+
+    pub fn power_destroy(&mut self) {
+        for b in &mut self.ennemies {
+            if (b.pos - self.player.pos).length() < (self.player.radius + DESTROY_RANGE) {
+                b.alive = false;
+            }
+        }
     }
 }

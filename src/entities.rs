@@ -6,7 +6,7 @@ pub enum EntityType {
     Bullet,                 // Red circle
     Follower,               // Blue triangle
     Pather(VecDeque<Vec2>), // Green square
-    Player(u8, u8),         // The player
+    Player,                 // The player
     HealItem,               // Hearth that heals the player
     ManaItem,               // blue circle that give mana to player
 }
@@ -45,7 +45,7 @@ impl Entity {
         Self {
             pos: CENTER,
             speed: Vec2::ZERO,
-            e_type: EntityType::Player(3, 4),
+            e_type: EntityType::Player,
             radius: 2.,
             alive: true,
         }
@@ -113,7 +113,7 @@ impl Entity {
             EntityType::Bullet => self.bullet_tick(),
             EntityType::Follower => self.follower_tick(target_pos),
             EntityType::Pather(_) => self.pather_tick(),
-            EntityType::Player(_, _) => self.player_tick(),
+            EntityType::Player => self.player_tick(),
             EntityType::HealItem => (),
             EntityType::ManaItem => (),
         }
