@@ -24,9 +24,9 @@ pub struct Entity {
 }
 
 const SPAWN_DIST: f32 = 42.;
-const BULLET_SPEED: f32 = 1.;
-const FOLLOWER_SPEED: f32 = 1.;
-const PATHER_SPEED: f32 = 1.;
+const BULLET_SPEED: f32 = 0.25;
+const FOLLOWER_ACCELERATION: f32 = 0.01;
+const PATHER_SPEED: f32 = 0.25;
 pub const WORLD_WIDTH: f32 = 40.;
 pub const WORLD_HEIGHT: f32 = 30.;
 const CENTER: Vec2 = Vec2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.);
@@ -50,7 +50,7 @@ impl Entity {
             pos: CENTER,
             speed: Vec2::ZERO,
             e_type: EntityType::Player,
-            radius: 1.,
+            radius: 0.5,
             alive: true,
             rotation: PI / 2.,
         }
@@ -64,7 +64,7 @@ impl Entity {
             pos,
             speed,
             e_type: EntityType::Bullet,
-            radius: 0.5,
+            radius: 0.25,
             alive: true,
             rotation: 0.,
         }
@@ -98,7 +98,7 @@ impl Entity {
             pos,
             speed,
             e_type: EntityType::Pather(path),
-            radius: 0.5,
+            radius: 0.25,
             alive: true,
             rotation: 0.,
         }
@@ -165,10 +165,11 @@ impl Entity {
     }
 
     fn follower_tick(&mut self, target_pos: Vec2) {
-        self.speed = (target_pos - self.pos).normalize() * FOLLOWER_SPEED;
+        self.speed += (target_pos - self.pos).normalize() * FOLLOWER_ACCELERATION;
+        self.speed *= 0.95;
         self.rotation = self.speed.y.atan2(self.speed.x);
-        self.radius -= 0.1;
-        if self.radius < 0. {
+        self.radius -= 0.001;
+        if self.radius < 0.1 {
             self.alive = false;
         }
         self.pos += self.speed;
