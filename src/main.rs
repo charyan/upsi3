@@ -27,6 +27,7 @@ struct UIElement {
     texture: Texture2D,
     position: Vec2,
     draw_dst: Vec2,
+    visible: bool,
 }
 
 impl UIElement {
@@ -37,33 +38,40 @@ impl UIElement {
             texture,
             position,
             draw_dst,
+            visible: true,
         }
     }
 
     pub fn draw(&self) {
-        draw_texture_ex(
-            self.texture,
-            self.position.x,
-            self.position.y,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(self.draw_dst),
-                flip_x: false,
-                flip_y: false,
-                pivot: None,
-                source: None,
-                rotation: 0.,
-            },
-        );
+        if self.visible {
+            draw_texture_ex(
+                self.texture,
+                self.position.x,
+                self.position.y,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(self.draw_dst),
+                    flip_x: false,
+                    flip_y: false,
+                    pivot: None,
+                    source: None,
+                    rotation: 0.,
+                },
+            );
+        }
     }
 
     pub fn collide(&self, position: Vec2) -> bool {
-        let x_collide =
-            (position.x >= self.position.x) && (position.x <= self.position.x + self.draw_dst.x);
-        let y_collide =
-            (position.y >= self.position.y) && (position.y <= self.position.y + self.draw_dst.y);
+        if self.visible {
+            let x_collide = (position.x >= self.position.x)
+                && (position.x <= self.position.x + self.draw_dst.x);
+            let y_collide = (position.y >= self.position.y)
+                && (position.y <= self.position.y + self.draw_dst.y);
 
-        x_collide && y_collide
+            x_collide && y_collide
+        } else {
+            false
+        }
     }
 }
 
@@ -103,7 +111,7 @@ fn draw_bsod_text(message: String) {
     y += y_diff;
     draw_text("", 50., y, font_size_bsod, WHITE);
     y += y_diff;
-    draw_text(&format!("{}", message), 50., y, font_size_bsod, WHITE);
+    draw_text(&format!("{}", message), 50., y, font_size_bsod * 1.5, WHITE);
     y += y_diff;
     draw_text("", 50., y, font_size_bsod, WHITE);
     y += y_diff;
@@ -234,19 +242,19 @@ async fn main() {
         include_bytes!("../assets/wallpaper.png"),
     );
 
-    let icon_ung = UIElement::new(
+    let mut icon_ung = UIElement::new(
         vec2(20., 20.),
         vec2(64., 80.),
         include_bytes!("../assets/icon_ung.png"),
     );
 
-    let icon_dbg = UIElement::new(
+    let mut icon_dbg = UIElement::new(
         vec2(20., 120.),
         vec2(64., 80.),
         include_bytes!("../assets/icon_dbg.png"),
     );
 
-    let icon_ach = UIElement::new(
+    let mut icon_ach = UIElement::new(
         vec2(20., 220.),
         vec2(64., 80.),
         include_bytes!("../assets/icon_ach.png"),
@@ -266,6 +274,9 @@ async fn main() {
     achievements.achievements[5].unlock();
 
     let bsod_message = "Overflow on name input";
+
+    // icon_dbg.visible = false;
+    // icon_ach.visible = false;
 
     loop {
         clear_background(WHITE);
@@ -310,6 +321,29 @@ async fn main() {
             }
 
             GameState::DebugGame => {
+                let dbg_pos = vec2(screen_width() * 2. / 3., TITLE_BAR_HEIGHT);
+                let mut list_pos = vec2(dbg_pos.x + 20., dbg_pos.y + 40.);
+                let list_font_size = 40.;
+
+                draw_rectangle(
+                    dbg_pos.x,
+                    dbg_pos.y,
+                    screen_width() / 3.,
+                    screen_height() - TITLE_BAR_HEIGHT,
+                    DARKGRAY,
+                );
+
+                let debug_list = vec![
+                    format!("mouse_pos_x: {}", mouse_position().0),
+                    format!("mouse_pos_y: {}", mouse_position().1),
+                ];
+
+                for item in debug_list {
+                    draw_text(&item, list_pos.x, list_pos.y, list_font_size, WHITE);
+
+                    list_pos.y += list_font_size;
+                }
+
                 window_decorations(&mut game_state, &mut cross, "Unglitched (Debug mode)");
             }
 
