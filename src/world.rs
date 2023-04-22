@@ -118,8 +118,6 @@ impl World {
         for b in &mut self.enemies {
             b.tick(self.player.pos);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
-                self.player.hit_anim = 10;
-
                 play_sound(
                     resources.hit_sound,
                     PlaySoundParams {
@@ -140,6 +138,7 @@ impl World {
                             to_raise_unstability = true;
                         }
                     }
+                    self.player.hit_anim = 10;
                 }
                 b.alive = false;
             }
