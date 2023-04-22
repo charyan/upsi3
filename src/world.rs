@@ -1,6 +1,6 @@
 use crate::{
     achievements,
-    entities::{self, Entity, EntityType},
+    entities::{self, Entity, EntityType, WORLD_HEIGHT, WORLD_WIDTH},
     resources::{self, Resources},
     GameState,
 };
@@ -233,69 +233,19 @@ impl World {
         if self.glitch_frequency_counter == 0 {
             match self.unstabiliy {
                 1 => {
-                    for b in &self.enemies {
-                        if rand::gen_range(0., 100.) < 0.02 {
-                            if !b.is_clone {
-                                self.duplicate = Some(b.clone());
-                                self.x_direction = rand::gen_range(-1, 1);
-                                self.y_direction = rand::gen_range(-1, 1);
-                                self.glitch_frequency_counter = GLITCH_SPEED * 3;
-                                break;
-                            }
-                        }
-                    }
+                    self.initialize_glitch(0.01);
                 }
                 2 => {
-                    for b in &self.enemies {
-                        if rand::gen_range(0., 100.) < 0.05 {
-                            if !b.is_clone {
-                                self.duplicate = Some(b.clone());
-                                self.x_direction = rand::gen_range(-1, 1);
-                                self.y_direction = rand::gen_range(-1, 1);
-                                self.glitch_frequency_counter = GLITCH_SPEED * 4;
-                                break;
-                            }
-                        }
-                    }
+                    self.initialize_glitch(0.05);
                 }
                 3 => {
-                    for b in &self.enemies {
-                        if rand::gen_range(0., 100.) < 0.07 {
-                            if !b.is_clone {
-                                self.duplicate = Some(b.clone());
-                                self.x_direction = rand::gen_range(-1, 1);
-                                self.y_direction = rand::gen_range(-1, 1);
-                                self.glitch_frequency_counter = GLITCH_SPEED * 5;
-                                break;
-                            }
-                        }
-                    }
+                    self.initialize_glitch(0.07);
                 }
                 4 => {
-                    for b in &self.enemies {
-                        if rand::gen_range(0., 100.) < 0.1 {
-                            if !b.is_clone {
-                                self.duplicate = Some(b.clone());
-                                self.x_direction = rand::gen_range(-1, 1);
-                                self.y_direction = rand::gen_range(-1, 1);
-                                self.glitch_frequency_counter = GLITCH_SPEED * 6;
-                                break;
-                            }
-                        }
-                    }
+                    self.initialize_glitch(0.1);
                 }
                 5 => {
-                    for b in &self.enemies {
-                        if rand::gen_range(0., 100.) < 1. {
-                            if !b.is_clone {
-                                self.duplicate = Some(b.clone());
-                                self.x_direction = rand::gen_range(-1, 1);
-                                self.y_direction = rand::gen_range(-1, 1);
-                                self.glitch_frequency_counter = GLITCH_SPEED * 7;
-                                break;
-                            }
-                        }
-                    }
+                    self.initialize_glitch(1.);
                 }
                 _ => (),
             }
@@ -345,6 +295,22 @@ impl World {
         );
         self.enemies.push(clone.clone());
         self.duplicate = Some(clone);
+    }
+
+    pub fn initialize_glitch(&mut self, percentage: f32) {
+        for b in &self.enemies {
+            if b.pos.x > 0. && b.pos.x < WORLD_WIDTH && b.pos.y > 0. && b.pos.y < WORLD_HEIGHT {
+                if rand::gen_range(0., 100.) < percentage {
+                    if !b.is_clone {
+                        self.duplicate = Some(b.clone());
+                        self.x_direction = rand::gen_range(-1, 1);
+                        self.y_direction = rand::gen_range(-1, 1);
+                        self.glitch_frequency_counter = GLITCH_SPEED * 6;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     pub fn bsod(&mut self, game_state: &mut GameState, resources: &Resources) {
