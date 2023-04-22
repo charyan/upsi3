@@ -1,15 +1,15 @@
-use std::{f32::consts::TAU, collections::VecDeque};
+use std::{collections::VecDeque, f32::consts::TAU};
 
 use macroquad::prelude::*;
 
-enum EntityType {
-    Bullet,   // Red circle
-    Follower, // Blue triangle
-    Pather(VecDeque<Vec2>),   // Green square
-    Player(u8),   // The player
+pub enum EntityType {
+    Bullet,                 // Red circle
+    Follower,               // Blue triangle
+    Pather(VecDeque<Vec2>), // Green square
+    Player(u8),             // The player
 }
 
-struct Entity {
+pub struct Entity {
     pos: Vec2,
     speed: Vec2,
     e_type: EntityType,
@@ -23,7 +23,7 @@ const FOLLOWER_SPEED: f32 = 1.;
 const PATHER_SPEED: f32 = 1.;
 const WORLD_WIDTH: f32 = 40.;
 const WORLD_HEIGHT: f32 = 30.;
-const CENTER: Vec2 = Vec2::new(WORLD_WIDTH/2., WORLD_HEIGHT/2.);
+const CENTER: Vec2 = Vec2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.);
 
 fn random_outside_pos() -> Vec2 {
     let angle = rand::gen_range(0., TAU);
@@ -34,8 +34,8 @@ fn random_outside_pos() -> Vec2 {
 fn random_inside_pos() -> Vec2 {
     let x: f32 = rand::gen_range(0., WORLD_WIDTH);
     let y: f32 = rand::gen_range(0., WORLD_HEIGHT);
-    
-    Vec2::new(x,y)
+
+    Vec2::new(x, y)
 }
 
 impl Entity {
@@ -70,18 +70,17 @@ impl Entity {
             pos,
             speed,
             e_type: EntityType::Follower,
-            radius: 1., 
+            radius: 1.,
             alive: true,
         }
     }
 
     pub fn new_random_pather(target_pos: Vec2) -> Self {
         let pos = random_outside_pos();
-        let speed = Vec2::new(PATHER_SPEED,PATHER_SPEED);
+        let speed = Vec2::new(PATHER_SPEED, PATHER_SPEED);
         let mut path = VecDeque::new();
         path.push_back(random_outside_pos());
-        for _ in 0..3
-        {
+        for _ in 0..3 {
             path.push_back(random_inside_pos());
         }
         path.push_back(random_outside_pos());
@@ -109,35 +108,32 @@ impl Entity {
     }
 
     fn bullet_tick(&mut self) {
-        if self.pos.length() > SPAWN_DIST+1.
-        {
+        if self.pos.length() > SPAWN_DIST + 1. {
             self.alive = false;
         }
         self.pos += self.speed;
     }
 
-    fn follower_tick(&mut self, target_pos: Vec2){
+    fn follower_tick(&mut self, target_pos: Vec2) {
         self.speed = (target_pos - self.pos).normalize() * FOLLOWER_SPEED;
         self.radius -= 0.1;
-        if self.radius < 0. 
-        {
+        if self.radius < 0. {
             self.alive = false;
         }
         self.pos += self.speed;
     }
 
-    fn pather_tick(&mut self){
-
+    fn pather_tick(&mut self) {
         let path = match &mut self.e_type {
             EntityType::Pather(path) => path,
-            _ => {unreachable!()}
+            _ => {
+                unreachable!()
+            }
         };
 
-        if let Some(point) = path.front()
-        {
+        if let Some(point) = path.front() {
             self.speed = (*point - self.pos).normalize() * PATHER_SPEED;
-            if (self.pos - *point).length() < 2. 
-            {
+            if (self.pos - *point).length() < 2. {
                 path.pop_front().unwrap();
             }
         } else {
