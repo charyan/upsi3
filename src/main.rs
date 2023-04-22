@@ -406,7 +406,7 @@ impl GlitchEffect {
     pub fn set(&mut self, count: u32, intensity_multiplicator: f32) {
         self.count = count;
         self.intensity_multiplicator = intensity_multiplicator;
-        self.texture = Texture2D::from_image(&get_screen_data());
+        // self.texture = Texture2D::from_image(&get_screen_data());
     }
 
     pub fn run(&mut self) {
