@@ -12,6 +12,8 @@ pub struct World {
     pub mana: u8,
 }
 
+const PLAYER_SPEED: f32 = 0.1;
+
 impl World {
     pub fn new() -> Self {
         Self {
@@ -24,6 +26,21 @@ impl World {
     }
 
     pub fn tick(&mut self) {
+        if is_key_down(KeyCode::D) {
+            self.player.speed.x += PLAYER_SPEED;
+        }
+        if is_key_down(KeyCode::A) {
+            self.player.speed.x -= PLAYER_SPEED;
+        }
+        if is_key_down(KeyCode::S) {
+            self.player.speed.y += PLAYER_SPEED;
+        }
+        if is_key_down(KeyCode::W) {
+            self.player.speed.y -= PLAYER_SPEED;
+        }
+
+        self.player.speed *= 0.9;
+
         self.player.tick(Vec2::ZERO);
 
         for b in &mut self.ennemies {
