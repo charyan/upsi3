@@ -9,6 +9,10 @@ pub struct Resources {
     pub follower: Texture2D,
     pub pather: Texture2D,
 
+    pub bullet_glitch: Texture2D,
+    pub follower_glitch: Texture2D,
+    pub pather_glitch: Texture2D,
+
     pub heart: Texture2D,
     pub energy: Texture2D,
 
@@ -36,6 +40,10 @@ impl Resources {
         let bullet = new_texture(include_bytes!("../assets/images/bullet.png"));
         let follower = new_texture(include_bytes!("../assets/images/follower.png"));
         let pather = new_texture(include_bytes!("../assets/images/pather.png"));
+
+        let bullet_glitch = new_texture(include_bytes!("../assets/images/bullet_glitch.png"));
+        let follower_glitch = new_texture(include_bytes!("../assets/images/follower_glitch.png"));
+        let pather_glitch = new_texture(include_bytes!("../assets/images/pather_glitch.png"));
 
         let heart = new_texture(include_bytes!("../assets/images/heart.png"));
         let energy = new_texture(include_bytes!("../assets/images/energy.png"));
@@ -79,6 +87,9 @@ impl Resources {
             bullet,
             follower,
             pather,
+            bullet_glitch,
+            follower_glitch,
+            pather_glitch,
             heart,
             energy,
             bsod_sound,
