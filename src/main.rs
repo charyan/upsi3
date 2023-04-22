@@ -477,19 +477,19 @@ async fn main() {
         include_bytes!("../assets/images/wallpaper.png"),
     );
 
-    let icon_ung = UIElement::new(
+    let mut icon_ung = UIElement::new(
         vec2(20., 20.),
         vec2(64., 80.),
         include_bytes!("../assets/images/icon_ung.png"),
     );
 
-    let icon_dbg = UIElement::new(
+    let mut icon_dbg = UIElement::new(
         vec2(20., 120.),
         vec2(64., 80.),
         include_bytes!("../assets/images/icon_dbg.png"),
     );
 
-    let icon_ach = UIElement::new(
+    let mut icon_ach = UIElement::new(
         vec2(20., 220.),
         vec2(64., 80.),
         include_bytes!("../assets/images/icon_ach.png"),
