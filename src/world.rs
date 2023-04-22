@@ -9,7 +9,7 @@ const PATHER_SPAWNER: i32 = 150;
 
 pub struct World {
     pub player: Entity,
-    pub ennemies: Vec<Entity>,
+    pub enemies: Vec<Entity>,
     pub items: Vec<Entity>,
     pub hp: u8,
     pub mana: u8,
@@ -21,7 +21,7 @@ impl World {
     pub fn new() -> Self {
         Self {
             player: Entity::new_player(),
-            ennemies: Vec::new(),
+            enemies: Vec::new(),
             items: Vec::new(),
             hp: 3,
             mana: 4,
@@ -35,7 +35,7 @@ impl World {
 
         if bullet_spawn_counter == BULLET_SPAWNER {
             bullet_spawn_counter = 0;
-            self.ennemies
+            self.enemies
                 .push(Entity::new_random_bullet(self.player.pos));
         } else {
             bullet_spawn_counter += 1;
@@ -43,7 +43,7 @@ impl World {
 
         if follower_spawn_counter == BULLET_SPAWNER {
             follower_spawn_counter = 0;
-            self.ennemies
+            self.enemies
                 .push(Entity::new_random_follower(self.player.pos));
         } else {
             follower_spawn_counter += 1;
@@ -51,7 +51,7 @@ impl World {
 
         if pather_spawn_counter == BULLET_SPAWNER {
             pather_spawn_counter = 0;
-            self.ennemies.push(Entity::new_random_pather());
+            self.enemies.push(Entity::new_random_pather());
         } else {
             pather_spawn_counter += 1;
         }
@@ -73,7 +73,7 @@ impl World {
 
         self.player.tick(Vec2::ZERO);
 
-        for b in &mut self.ennemies {
+        for b in &mut self.enemies {
             b.tick(Vec2::ZERO);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
                 if let Some(new_hp) = self.hp.checked_sub(1) {
@@ -109,12 +109,12 @@ impl World {
             }
         }
 
-        self.ennemies.retain(|e| e.alive);
+        self.enemies.retain(|e| e.alive);
         self.items.retain(|e| e.alive);
     }
 
     pub fn power_destroy(&mut self) {
-        for b in &mut self.ennemies {
+        for b in &mut self.enemies {
             if (b.pos - self.player.pos).length() < (self.player.radius + DESTROY_RANGE) {
                 b.alive = false;
             }
