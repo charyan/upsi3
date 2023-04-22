@@ -17,17 +17,31 @@ fn new_texture(bytes: &[u8]) -> Texture2D {
 
 impl Resources {
     pub async fn load() -> Self {
-        let player = new_texture(include_bytes!("../assets/player.png"));
-        let bullet = new_texture(include_bytes!("../assets/bullet.png"));
-        let heart = new_texture(include_bytes!("../assets/heart.png"));
+        let player = new_texture(include_bytes!("../assets/images/player.png"));
+        let bullet = new_texture(include_bytes!("../assets/images/bullet.png"));
+        let heart = new_texture(include_bytes!("../assets/images/heart.png"));
 
-        let bsod_sound = load_sound_from_bytes(include_bytes!("../assets/bsod_sound.wav"))
+        let bsod_sound = load_sound_from_bytes(include_bytes!("../assets/sounds/bsod_sound.wav"))
             .await
             .unwrap();
 
-        let samllbug_sound = load_sound_from_bytes(include_bytes!("../assets/smallbug_sound.wav"))
+        let samllbug_sound =
+            load_sound_from_bytes(include_bytes!("../assets/sounds/smallbug_sound.wav"))
+                .await
+                .unwrap();
+
+        let explosion = load_sound_from_bytes(include_bytes!("../assets/sounds/explosion.wav"))
             .await
             .unwrap();
+
+        let hit_sound = load_sound_from_bytes(include_bytes!("../assets/sounds/hit_sound.wav"))
+            .await
+            .unwrap();
+
+        let explosion_bug =
+            load_sound_from_bytes(include_bytes!("../assets/sounds/explosion_bug.wav"))
+                .await
+                .unwrap();
 
         Resources {
             player,

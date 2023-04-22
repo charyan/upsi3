@@ -11,42 +11,42 @@ impl Achievements {
         Self {
             achievements: vec![
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "name_overflow",
                     "Crash the game by choosing a big name",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "unstable",
                     "Crash the game by unstability",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "second_chance",
                     "Regain full health by underflowing HP",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "over_healed",
                     "Go back to zero health by regeneration",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "unlimited_power",
                     "Use the special ability without having any energy for it",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "over_9000",
                     "Overflow your energy back to zero by regeneration too much",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "up",
                     "Leave the map",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/ach_unknown.png"),
+                    include_bytes!("../assets/images/ach_unknown.png"),
                     "reload_anyway",
                     "Restart loading by",
                 ),

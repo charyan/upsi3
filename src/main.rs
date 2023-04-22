@@ -239,31 +239,31 @@ async fn main() {
     let mut wallpaper = UIElement::new(
         vec2(0., 0.),
         vec2(screen_width(), screen_height()),
-        include_bytes!("../assets/wallpaper.png"),
+        include_bytes!("../assets/images/wallpaper.png"),
     );
 
     let mut icon_ung = UIElement::new(
         vec2(20., 20.),
         vec2(64., 80.),
-        include_bytes!("../assets/icon_ung.png"),
+        include_bytes!("../assets/images/icon_ung.png"),
     );
 
     let mut icon_dbg = UIElement::new(
         vec2(20., 120.),
         vec2(64., 80.),
-        include_bytes!("../assets/icon_dbg.png"),
+        include_bytes!("../assets/images/icon_dbg.png"),
     );
 
     let mut icon_ach = UIElement::new(
         vec2(20., 220.),
         vec2(64., 80.),
-        include_bytes!("../assets/icon_ach.png"),
+        include_bytes!("../assets/images/icon_ach.png"),
     );
 
     let mut cross = UIElement::new(
         vec2(screen_width() - 5. - 50., 5.),
         vec2(50., 50.),
-        include_bytes!("../assets/cross.png"),
+        include_bytes!("../assets/images/cross.png"),
     );
 
     let mut game_state = GameState::Desktop;
