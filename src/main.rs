@@ -16,7 +16,7 @@ use world::World;
 
 const TITLE_BAR_HEIGHT: f32 = 60.;
 
-enum GameState {
+pub enum GameState {
     Desktop,
     Game,
     DebugGame,
@@ -343,11 +343,6 @@ async fn main() {
 
     let mut game_state = GameState::Desktop;
 
-    let mut achievements = Achievements::new();
-
-    achievements.achievements[3].unlock();
-    achievements.achievements[5].unlock();
-
     let bsod_message = "Overflow on name input";
 
     // icon_dbg.visible = false;
@@ -390,7 +385,7 @@ async fn main() {
             }
 
             GameState::Game => {
-                world.tick(&resources);
+                world.tick(&resources, &mut game_state);
                 draw_game(&world, &resources);
 
                 if is_key_down(KeyCode::C) {
@@ -431,7 +426,7 @@ async fn main() {
                 let ach_x = 50.;
                 let mut ach_y = TITLE_BAR_HEIGHT + 10.;
 
-                let mut cl_ach = achievements.clone();
+                let mut cl_ach = world.achievements.clone();
 
                 let n_ele_col = cl_ach.achievements.len() / 2;
 

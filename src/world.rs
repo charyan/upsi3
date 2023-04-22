@@ -1,6 +1,8 @@
 use crate::{
+    achievements,
     entities::{Entity, EntityType},
     resources::{self, Resources},
+    GameState,
 };
 
 use macroquad::{
@@ -22,6 +24,8 @@ pub struct World {
     pub bullet_spawn_timer: u32,
     pub follower_spawn_timer: u32,
     pub pather_spawn_timer: u32,
+    pub achievements: achievements::Achievements,
+    pub unstabiliy: u32,
 }
 
 const PLAYER_SPEED: f32 = 0.1;
@@ -37,10 +41,12 @@ impl World {
             bullet_spawn_timer: 0,
             follower_spawn_timer: 0,
             pather_spawn_timer: 0,
+            achievements: achievements::Achievements::new(),
+            unstabiliy: 0,
         }
     }
 
-    pub fn tick(&mut self, resources: &Resources) {
+    pub fn tick(&mut self, resources: &Resources, game_state: &mut GameState) {
         if self.bullet_spawn_timer > BULLET_SPAWN_TIME {
             self.bullet_spawn_timer = 0;
             self.enemies
@@ -77,7 +83,7 @@ impl World {
             self.player.speed.y -= PLAYER_SPEED;
         }
         if is_key_pressed(KeyCode::Space) {
-            self.power_destroy(&resources);
+            self.power_destroy(&resources, game_state);
         }
 
         self.player.speed *= 0.9;
@@ -92,7 +98,14 @@ impl World {
                     self.hp = new_hp;
                 } else {
                     self.hp = 3;
+                    if self.achievements.achievements[2].unlocked == false {
+                        self.achievements.achievements[2].unlock();
+                        *game_state = GameState::BSOD;
+                    } else {
+                        self.unstabiliy += 20;
+                    }
                 }
+                b.alive = false;
             }
         }
 
@@ -103,22 +116,42 @@ impl World {
                     EntityType::HealItem => {
                         if self.hp + 1 > 3 {
                             self.hp = 0;
+                            if self.achievements.achievements[3].unlocked == false {
+                                self.achievements.achievements[3].unlock();
+                                *game_state = GameState::BSOD;
+                            } else {
+                                self.unstabiliy += 20;
+                            }
                         } else {
                             self.hp += 1;
                         }
-                        i.alive = false;
                     }
 
                     &EntityType::ManaItem => {
                         if self.mana + 1 > 4 {
                             self.mana = 0;
+                            if self.achievements.achievements[5].unlocked == false {
+                                self.achievements.achievements[5].unlock();
+                                *game_state = GameState::BSOD;
+                            } else {
+                                self.unstabiliy += 20;
+                            }
                         } else {
                             self.mana += 1;
                         }
-                        i.alive = false;
                     }
                     _ => unreachable!(),
                 }
+                i.alive = false;
+            }
+        }
+
+        if self.player.pos.y < -2. {
+            if self.achievements.achievements[6].unlocked == false {
+                self.achievements.achievements[6].unlock();
+                *game_state = GameState::BSOD;
+            } else {
+                self.unstabiliy += 20;
             }
         }
 
@@ -126,7 +159,7 @@ impl World {
         self.items.retain(|e| e.alive);
     }
 
-    pub fn power_destroy(&mut self, resources: &resources::Resources) {
+    pub fn power_destroy(&mut self, resources: &resources::Resources, game_state: &mut GameState) {
         play_sound(resources.explosion_sound, PlaySoundParams::default());
 
         for b in &mut self.enemies {
@@ -141,6 +174,12 @@ impl World {
                 self.mana = 3;
             } else if self.mana == 0 {
                 self.mana = 2;
+            }
+            if self.achievements.achievements[4].unlocked == false {
+                self.achievements.achievements[4].unlock();
+                *game_state = GameState::BSOD;
+            } else {
+                self.unstabiliy += 20;
             }
         }
     }
