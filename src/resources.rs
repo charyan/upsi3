@@ -30,16 +30,22 @@ impl Resources {
                 .await
                 .unwrap();
 
-        let explosion = load_sound_from_bytes(include_bytes!("../assets/sounds/explosion.wav"))
-            .await
-            .unwrap();
+        let explosion_sound =
+            load_sound_from_bytes(include_bytes!("../assets/sounds/explosion_sound.wav"))
+                .await
+                .unwrap();
 
         let hit_sound = load_sound_from_bytes(include_bytes!("../assets/sounds/hit_sound.wav"))
             .await
             .unwrap();
 
-        let explosion_bug =
-            load_sound_from_bytes(include_bytes!("../assets/sounds/explosion_bug.wav"))
+        let explosion_bug_sound =
+            load_sound_from_bytes(include_bytes!("../assets/sounds/explosion_bug_sound.wav"))
+                .await
+                .unwrap();
+
+        let picking_item_sound =
+            load_sound_from_bytes(include_bytes!("../assets/sounds/picking_item_sound.wav"))
                 .await
                 .unwrap();
 
