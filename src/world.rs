@@ -10,11 +10,12 @@ use macroquad::{
     prelude::*,
 };
 
-const DESTROY_RANGE: f32 = 10.;
+const DESTROY_RANGE: f32 = 5.;
 const BULLET_SPAWN_TIME: u32 = 60;
 const FOLLOWER_SPAWN_TIME: u32 = 200;
 const PATH_SPAWN_TIME: u32 = 150;
 const INSTABILITY_UP: u32 = 1;
+const MAX_UNSTABILITY: u32 = 5;
 
 pub struct World {
     pub player: Entity,
@@ -181,8 +182,29 @@ impl World {
             }
         }
 
-        self.enemies.retain(|e| e.alive);
+        self.enemies.retain(|e| {
+            if !e.alive {
+                match e.e_type {
+                    EntityType::Follower => {
+                        if rand::gen_range(0., 100.) < 12.5 {
+                            self.items.push(Entity::new_heal_item());
+                        } else if rand::gen_range(0., 100.) < 12.5 {
+                            self.items.push(Entity::new_mana_item());
+                        }
+                    }
+                    _ => (),
+                }
+            }
+            e.alive
+        });
         self.items.retain(|e| e.alive);
+
+        if self.unstabiliy > MAX_UNSTABILITY {
+            self.achievements.achievements[1].unlock();
+            *bsod_message = self.achievements.achievements[1].name.to_owned();
+            *game_state = GameState::BSOD;
+            play_sound(resources.bsod_sound, PlaySoundParams::default())
+        }
     }
 
     pub fn power_destroy(
