@@ -221,7 +221,13 @@ fn draw_bsod_text(message: String) {
     );
 }
 
-fn draw_sprite(texture: Texture2D, mut pos: Vec2, mut radius: f32, screen_width: f32) {
+fn draw_sprite(
+    texture: Texture2D,
+    mut pos: Vec2,
+    mut radius: f32,
+    screen_width: f32,
+    rotation: f32,
+) {
     let scale = screen_width / WORLD_WIDTH;
 
     pos -= Vec2::new(radius, radius);
@@ -238,7 +244,7 @@ fn draw_sprite(texture: Texture2D, mut pos: Vec2, mut radius: f32, screen_width:
         DrawTextureParams {
             dest_size: Some(Vec2::new(radius * 2., radius * 2.)),
             source: None,
-            rotation: 0.,
+            rotation,
             flip_x: false,
             flip_y: false,
             pivot: None,
@@ -291,7 +297,13 @@ fn draw_game(world: &World, resources: &Resources) {
     let player_pos = world.player.pos;
     let player_radius = world.player.radius;
 
-    draw_sprite(resources.player, player_pos, player_radius, screen_width());
+    draw_sprite(
+        resources.player,
+        player_pos,
+        player_radius,
+        screen_width(),
+        world.player.rotation,
+    );
 
     for enemy in &world.enemies {
         let texture = match &enemy.e_type {
@@ -301,7 +313,13 @@ fn draw_game(world: &World, resources: &Resources) {
             _ => unreachable!(),
         };
 
-        draw_sprite(texture, enemy.pos, enemy.radius, screen_width());
+        draw_sprite(
+            texture,
+            enemy.pos,
+            enemy.radius,
+            screen_width(),
+            enemy.rotation,
+        );
     }
 }
 
@@ -354,7 +372,7 @@ async fn main() {
     };
 
     loop {
-        clear_background(WHITE);
+        clear_background(BLACK);
         wallpaper.draw_dst = vec2(screen_width(), screen_height());
 
         match game_state {

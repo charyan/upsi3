@@ -28,7 +28,7 @@ pub struct World {
     pub unstabiliy: u32,
 }
 
-const PLAYER_SPEED: f32 = 0.1;
+const PLAYER_SPEED: f32 = 0.05;
 
 impl World {
     pub fn new() -> Self {
@@ -91,7 +91,7 @@ impl World {
         self.player.tick(Vec2::ZERO);
 
         for b in &mut self.enemies {
-            b.tick(Vec2::ZERO);
+            b.tick(self.player.pos);
             if (b.pos - self.player.pos).length() < (self.player.radius + b.radius) {
                 play_sound(resources.hit_sound, PlaySoundParams::default());
                 if let Some(new_hp) = self.hp.checked_sub(1) {
