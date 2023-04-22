@@ -4,6 +4,7 @@ use macroquad::prelude::*;
 pub struct Resources {
     pub player: Texture2D,
     pub player_hit: Texture2D,
+    pub power_up: Texture2D,
 
     pub bullet: Texture2D,
     pub follower: Texture2D,
@@ -15,6 +16,7 @@ pub struct Resources {
 
     pub heart: Texture2D,
     pub energy: Texture2D,
+    pub bug: Texture2D,
 
     pub glitch_sound: Sound,
     pub bsod_sound: Sound,
@@ -38,6 +40,7 @@ impl Resources {
     pub async fn load() -> Self {
         let player = new_texture(include_bytes!("../assets/images/player.png"));
         let player_hit = new_texture(include_bytes!("../assets/images/player_hit.png"));
+        let power_up = new_texture(include_bytes!("../assets/images/power_up.png"));
 
         let bullet = new_texture(include_bytes!("../assets/images/bullet.png"));
         let follower = new_texture(include_bytes!("../assets/images/follower.png"));
@@ -49,6 +52,7 @@ impl Resources {
 
         let heart = new_texture(include_bytes!("../assets/images/heart.png"));
         let energy = new_texture(include_bytes!("../assets/images/energy.png"));
+        let bug = new_texture(include_bytes!("../assets/images/bug.png"));
 
         let bsod_sound = load_sound_from_bytes(include_bytes!("../assets/sounds/bsod_sound.wav"))
             .await
@@ -90,6 +94,7 @@ impl Resources {
         Resources {
             player,
             player_hit,
+            power_up,
             bullet,
             follower,
             pather,
@@ -98,6 +103,7 @@ impl Resources {
             pather_glitch,
             heart,
             energy,
+            bug,
             bsod_sound,
             small_bug_sound,
             explosion_sound,

@@ -10,7 +10,7 @@ use macroquad::{
     prelude::*,
 };
 
-const DESTROY_RANGE: f32 = 5.;
+pub const DESTROY_RANGE: f32 = 5.;
 const BULLET_SPAWN_TIME: u32 = 60;
 const FOLLOWER_SPAWN_TIME: u32 = 200;
 const PATH_SPAWN_TIME: u32 = 150;
@@ -28,13 +28,14 @@ pub struct World {
     pub follower_spawn_timer: u32,
     pub pather_spawn_timer: u32,
     pub achievements: achievements::Achievements,
-    pub unstabiliy: u32,
+    pub instability: u32,
     pub glitch_frequency_counter: u32,
     pub x_direction: i32,
     pub y_direction: i32,
     pub duplicate: Option<Entity>,
     pub has_game_started: bool,
     pub glitch_effect: GlitchEffect,
+    pub power_up_timer: u32,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -51,18 +52,19 @@ impl World {
             follower_spawn_timer: 0,
             pather_spawn_timer: 0,
             achievements: achievements::Achievements::new(),
-            unstabiliy: 0,
+            instability: 0,
             glitch_frequency_counter: 0,
             x_direction: 0,
             y_direction: 0,
             duplicate: None,
             has_game_started: false,
             glitch_effect: GlitchEffect::new(),
+            power_up_timer: 0,
         }
     }
 
     pub fn raise_unstability(&mut self) {
-        self.unstabiliy += INSTABILITY_UP;
+        self.instability += INSTABILITY_UP;
     }
 
     pub fn tick(
@@ -71,6 +73,10 @@ impl World {
         game_state: &mut GameState,
         bsod_message: &mut String,
     ) {
+        if self.power_up_timer > 0 {
+            self.power_up_timer -= 1;
+        }
+
         let mut to_raise_unstability = false;
 
         if self.bullet_spawn_timer > BULLET_SPAWN_TIME {
@@ -219,7 +225,7 @@ impl World {
         });
         self.items.retain(|e| e.alive);
 
-        if self.unstabiliy > MAX_UNSTABILITY {
+        if self.instability > MAX_UNSTABILITY {
             self.achievements.achievements[1].unlock();
             *bsod_message = self.achievements.achievements[1].name.to_owned();
             self.bsod(game_state, resources);
@@ -235,7 +241,7 @@ impl World {
         }
 
         if self.glitch_frequency_counter == 0 {
-            match self.unstabiliy {
+            match self.instability {
                 1 => {
                     self.initialize_glitch(0.01);
                     self.glitch_effect.set(20, 0.5)
@@ -328,7 +334,7 @@ impl World {
         self.player.speed = Vec2::ZERO;
         self.hp = 3;
         self.mana = 3;
-        self.unstabiliy = 0;
+        self.instability = 0;
         self.bullet_spawn_timer = 0;
         self.pather_spawn_timer = 0;
         self.follower_spawn_timer = 0;
@@ -342,6 +348,8 @@ impl World {
         game_state: &mut GameState,
         bsod_message: &mut String,
     ) {
+        self.power_up_timer = 7;
+
         play_sound(
             resources.explosion_sound,
             PlaySoundParams {
@@ -351,7 +359,7 @@ impl World {
         );
 
         for b in &mut self.enemies {
-            if (b.pos - self.player.pos).length() < (self.player.radius + DESTROY_RANGE) {
+            if (b.pos - self.player.pos).length() < (DESTROY_RANGE) {
                 b.alive = false;
             }
         }

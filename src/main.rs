@@ -15,7 +15,7 @@ use macroquad::{
     prelude::*,
 };
 use resources::Resources;
-use world::World;
+use world::{World, DESTROY_RANGE};
 
 const TITLE_BAR_HEIGHT: f32 = 60.;
 
@@ -548,6 +548,26 @@ fn draw_game(world: &World, resources: &Resources) {
             resources.energy,
             Vec2::new(4. + i as f32 * 0.8, 1.),
             0.3,
+            screen_width(),
+            0.,
+        );
+    }
+
+    for i in 0..world.instability {
+        draw_ui(
+            resources.bug,
+            Vec2::new(39. - i as f32 * 0.8, 1.),
+            0.3,
+            screen_width(),
+            0.,
+        );
+    }
+
+    if world.power_up_timer > 0 {
+        draw_sprite(
+            resources.power_up,
+            player_pos,
+            DESTROY_RANGE,
             screen_width(),
             0.,
         );
