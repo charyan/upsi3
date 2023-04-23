@@ -240,6 +240,13 @@ impl Popup {
                 } else if world.show_credits_1 {
                     world.show_credits_1 = false;
                     world.show_credits_2 = true;
+                    play_sound(
+                        resources.or_did_you,
+                        PlaySoundParams {
+                            looped: false,
+                            volume: 0.5,
+                        },
+                    )
                 } else if world.show_credits_2 {
                     world.show_credits_2 = false;
                     world.show_final_bsod = true;
