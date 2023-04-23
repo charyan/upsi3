@@ -328,9 +328,7 @@ impl World {
         }
     }
 
-    pub fn bsod(&mut self, game_state: &mut GameState, resources: &Resources) {
-        *game_state = GameState::BSOD;
-        play_sound(resources.bsod_sound, PlaySoundParams::default());
+    pub fn reset(&mut self) {
         self.player.pos = entities::CENTER;
         self.player.speed = Vec2::ZERO;
         self.hp = 3;
@@ -341,6 +339,12 @@ impl World {
         self.follower_spawn_timer = 0;
         self.enemies.clear();
         self.items.clear();
+    }
+
+    pub fn bsod(&mut self, game_state: &mut GameState, resources: &Resources) {
+        *game_state = GameState::BSOD;
+        play_sound(resources.bsod_sound, PlaySoundParams::default());
+        self.reset();
     }
 
     pub fn power_destroy(

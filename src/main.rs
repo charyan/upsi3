@@ -680,17 +680,20 @@ async fn main() {
                     if !popup.visible {
                         world.has_game_started = true;
 
-                        if world.achievements.achievements[0].unlocked {
-                            world.raise_unstability();
-                        } else if input_text.len() > 8 {
-                            world.achievements.achievements[0].unlock();
-                            bsod_message = world.achievements.achievements[0].name.to_string();
-                            game_state = GameState::BSOD;
-                            play_sound(resources.bsod_sound, PlaySoundParams::default());
+                        if input_text.len() > 8 {
+                            if world.achievements.achievements[0].unlocked {
+                                world.raise_unstability();
+                            } else {
+                                world.achievements.achievements[0].unlock();
+                                bsod_message = world.achievements.achievements[0].name.to_string();
+                                game_state = GameState::BSOD;
+                                play_sound(resources.bsod_sound, PlaySoundParams::default());
+                            }
                         }
                     }
                 }
                 if popup.visible {
+                    world.reset();
                     world.has_game_started = false;
 
                     root_ui().push_skin(&skin);
