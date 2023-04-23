@@ -2,7 +2,7 @@ use crate::{
     achievements,
     entities::{self, Entity, EntityType, WORLD_HEIGHT, WORLD_WIDTH},
     resources::{self, Resources},
-    GameState, GlitchEffect,
+    GameState, GlitchEffect, Popup, PopupStyle,
 };
 
 use macroquad::{
@@ -72,6 +72,7 @@ impl World {
         resources: &Resources,
         game_state: &mut GameState,
         bsod_message: &mut String,
+        last_game_state: &mut GameState,
     ) {
         if self.power_up_timer > 0 {
             self.power_up_timer -= 1;
@@ -248,15 +249,15 @@ impl World {
                 }
                 2 => {
                     self.initialize_glitch(0.05);
-                    self.glitch_effect.set(20, 1.)
+                    self.glitch_effect.set(20, 1.);
                 }
                 3 => {
                     self.initialize_glitch(0.07);
-                    self.glitch_effect.set(20, 2.)
+                    self.glitch_effect.set(20, 2.);
                 }
                 4 => {
                     self.initialize_glitch(0.1);
-                    self.glitch_effect.set(20, 4.)
+                    self.glitch_effect.set(20, 4.);
                 }
                 5 => {
                     self.initialize_glitch(1.);

@@ -27,7 +27,8 @@ pub enum GameState {
     BSOD,
 }
 
-struct UIElement {
+#[derive(Clone)]
+pub struct UIElement {
     texture: Texture2D,
     position: Vec2,
     draw_dst: Vec2,
@@ -79,7 +80,9 @@ impl UIElement {
     }
 }
 
-enum PopupStyle {
+#[derive(Clone)]
+
+pub enum PopupStyle {
     INFO,
     WARNING,
     ERROR,
@@ -95,7 +98,8 @@ impl PopupStyle {
     }
 }
 
-struct Popup {
+#[derive(Clone)]
+pub struct Popup {
     pub button: UIElement,
     pub position: Vec2,
     pub width: f32,
@@ -658,7 +662,12 @@ async fn main() {
 
             GameState::Game => {
                 if world.has_game_started {
-                    world.tick(&resources, &mut game_state, &mut bsod_message);
+                    world.tick(
+                        &resources,
+                        &mut game_state,
+                        &mut bsod_message,
+                        &mut last_game_state,
+                    );
                     draw_game(&world, &resources);
 
                     if is_key_down(KeyCode::C) {
@@ -705,26 +714,15 @@ async fn main() {
 
                 let mut cl_ach = world.achievements.clone();
 
-                let n_ele_col = (cl_ach.achievements.len() + 1) / 2;
-
-                for ach in &mut cl_ach.achievements[..n_ele_col] {
+                for ach in &mut cl_ach.achievements {
                     ach.draw(vec2(ach_x, ach_y));
-                    ach_y += ach.texture.height() + 10. + 10.;
-                }
-
-                ach_y = TITLE_BAR_HEIGHT + 10.;
-
-                for ach in &mut cl_ach.achievements[n_ele_col..] {
-                    ach.draw(vec2(screen_width() / 2. + 25., ach_y));
-                    ach_y += ach.texture.height() + 10. + 10.;
+                    ach_y += ach.texture.height() + 5.;
                 }
 
                 window_decorations(&mut game_state, &mut cross, "Achievements");
             }
 
             GameState::BSOD => {
-                popup.visible = false;
-
                 draw_rectangle(0., 0., screen_width(), screen_height(), DARKBLUE);
 
                 draw_bsod_text(&bsod_message);
@@ -733,22 +731,6 @@ async fn main() {
                     game_state = GameState::Desktop;
                 }
             }
-        }
-
-        if is_key_pressed(KeyCode::Key1) {
-            popup.visible = true;
-            world.glitch_effect.set(10, 0.5);
-            popup.style = PopupStyle::INFO;
-        }
-
-        if is_key_pressed(KeyCode::Key2) {
-            world.glitch_effect.set(10, 2.);
-            popup.style = PopupStyle::ERROR;
-        }
-
-        if is_key_down(KeyCode::Key3) {
-            popup.style = PopupStyle::WARNING;
-            world.glitch_effect.set(10, 4.);
         }
 
         popup.draw();
