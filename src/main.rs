@@ -723,6 +723,7 @@ async fn main() {
                                 // play_sound(resources.bsod_sound, PlaySoundParams::default());
 
                                 world.bsod(&mut game_state, &resources);
+                                world.glitch_effect.set(20, 2.);
                             }
                         }
                     }
