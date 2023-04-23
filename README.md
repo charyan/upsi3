@@ -1,2 +1,3 @@
-# UPSI3 GAME JAM
+# Unglitched
+Made during the UPsi3 Game Jam
 
