@@ -881,14 +881,6 @@ async fn main() {
             stop_sound(resources.music);
         }
 
-        if is_key_pressed(KeyCode::Space) {
-            world.disable_tutorial_2_x = true;
-
-            for ach in &mut world.achievements.achievements {
-                ach.unlock();
-            }
-        }
-
         last_game_state = game_state.clone();
 
         if world.show_final_bsod {
