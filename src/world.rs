@@ -36,6 +36,15 @@ pub struct World {
     pub has_game_started: bool,
     pub glitch_effect: GlitchEffect,
     pub power_up_timer: u32,
+    pub show_tutorial_1: bool,
+    pub show_tutorial_2: bool,
+    pub show_tutorial_3: bool,
+    pub show_tutorial_4: bool,
+    pub show_warning_popup: bool,
+    pub show_error_popup: bool,
+    pub show_ach_popup: bool,
+    pub show_input_popup: bool,
+    pub disable_bug_popup: bool,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -60,7 +69,27 @@ impl World {
             has_game_started: false,
             glitch_effect: GlitchEffect::new(),
             power_up_timer: 0,
+            show_tutorial_1: true,
+            show_tutorial_2: false,
+            show_tutorial_3: false,
+            show_tutorial_4: false,
+            show_warning_popup: false,
+            show_error_popup: false,
+            show_ach_popup: false,
+            show_input_popup: false,
+            disable_bug_popup: false,
         }
+    }
+
+    pub fn popup_shown(&self) -> bool {
+        self.show_input_popup
+            || self.show_error_popup
+            || self.show_warning_popup
+            || self.show_tutorial_1
+            || self.show_tutorial_2
+            || self.show_tutorial_3
+            || self.show_tutorial_4
+            || self.show_ach_popup
     }
 
     pub fn raise_unstability(&mut self, resources: &Resources) {
@@ -351,6 +380,11 @@ impl World {
         *game_state = GameState::BSOD;
         play_sound(resources.bsod_sound, PlaySoundParams::default());
         self.reset();
+
+        if !self.disable_bug_popup {
+            self.disable_bug_popup = true;
+            self.show_warning_popup = true;
+        }
     }
 
     pub fn power_destroy(
@@ -387,8 +421,9 @@ impl World {
             } else {
                 self.achievements.achievements[4].unlock();
                 *bsod_message = self.achievements.achievements[4].name.to_owned();
-                *game_state = GameState::BSOD;
-                play_sound(resources.bsod_sound, PlaySoundParams::default());
+                // *game_state = GameState::BSOD;
+                // play_sound(resources.bsod_sound, PlaySoundParams::default());
+                self.bsod(game_state, &resources);
             }
         }
     }

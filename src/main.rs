@@ -5,6 +5,7 @@ pub mod entities;
 pub mod resources;
 pub mod world;
 
+use std::sync::Arc;
 use std::{f32::consts::PI, u8};
 
 use entities::{EntityType, WORLD_WIDTH};
@@ -126,7 +127,7 @@ impl Popup {
         }
     }
 
-    pub fn draw(&mut self) {
+    pub fn draw(&mut self, world: &mut World) {
         if self.visible {
             draw_rectangle(
                 0.,
@@ -196,6 +197,29 @@ impl Popup {
                 && self.button.collide(Vec2::new(mouse_x, mouse_y))
             {
                 self.visible = false;
+
+                if world.show_tutorial_1 {
+                    world.show_tutorial_1 = false;
+                    world.show_tutorial_2 = true;
+                } else if world.show_tutorial_2 {
+                    world.show_tutorial_2 = false;
+                    world.show_tutorial_3 = true;
+                } else if world.show_tutorial_3 {
+                    world.show_tutorial_3 = false;
+                    world.show_tutorial_4 = true;
+                } else if world.show_tutorial_4 {
+                    world.show_tutorial_4 = false;
+                } else if world.show_warning_popup {
+                    world.show_warning_popup = false;
+                    world.show_error_popup = true;
+                } else if world.show_error_popup {
+                    world.show_error_popup = false;
+                    world.show_ach_popup = true;
+                } else if world.show_ach_popup {
+                    world.show_ach_popup = false;
+                } else if world.show_input_popup {
+                    world.show_input_popup = false
+                }
             }
         }
     }
@@ -618,7 +642,7 @@ async fn main() {
     // let mut glitch_effect = GlitchEffect::new();
 
     let mut popup = Popup::new();
-    popup.visible = false;
+    popup.visible = true;
 
     let skin = {
         let editbox_style = root_ui()
@@ -643,13 +667,13 @@ async fn main() {
                 icon_ung.draw();
                 icon_ach.draw();
 
-                if !popup.visible {
+                if !world.popup_shown() {
                     let (mouse_x, mouse_y) = mouse_position();
                     if is_mouse_button_pressed(MouseButton::Left)
                         && icon_ung.collide(Vec2::new(mouse_x, mouse_y))
                     {
                         game_state = GameState::Game;
-                        popup.visible = true;
+                        world.show_input_popup = true;
                     }
 
                     if is_mouse_button_pressed(MouseButton::Left)
@@ -670,9 +694,8 @@ async fn main() {
                     }
                 } else {
                     popup.style = PopupStyle::INFO;
-                    popup.text = "Enter your name (max 8 char)";
 
-                    if !popup.visible {
+                    if !world.show_input_popup {
                         world.has_game_started = true;
 
                         if input_text.len() > 8 {
@@ -681,13 +704,15 @@ async fn main() {
                             } else {
                                 world.achievements.achievements[0].unlock();
                                 bsod_message = world.achievements.achievements[0].name.to_string();
-                                game_state = GameState::BSOD;
-                                play_sound(resources.bsod_sound, PlaySoundParams::default());
+                                // game_state = GameState::BSOD;
+                                // play_sound(resources.bsod_sound, PlaySoundParams::default());
+
+                                world.bsod(&mut game_state, &resources);
                             }
                         }
                     }
                 }
-                if popup.visible {
+                if world.show_input_popup {
                     world.reset();
                     world.has_game_started = false;
 
@@ -732,7 +757,41 @@ async fn main() {
             }
         }
 
-        popup.draw();
+        popup.visible = true;
+
+        if world.show_tutorial_1 {
+            popup.text = "Welcome to Dinwows, the best Operating System";
+            popup.style = PopupStyle::INFO;
+        } else if world.show_tutorial_2 {
+            popup.text = "Play our best game \"Unglitched\" !";
+            popup.style = PopupStyle::WARNING
+        } else if world.show_tutorial_3 {
+            popup.text = "MOVE with W A S D";
+            popup.style = PopupStyle::WARNING
+        } else if world.show_tutorial_4 {
+            popup.text = "Use special ability with [SPACE]";
+            popup.style = PopupStyle::ERROR
+        } else if world.show_warning_popup {
+            if game_state == GameState::BSOD {
+                popup.visible = false;
+            }
+
+            popup.text = "This game doesn't have any bugs !";
+            popup.style = PopupStyle::WARNING
+        } else if world.show_error_popup {
+            popup.text = "Try to find all bugs anyway !";
+            popup.style = PopupStyle::ERROR
+        } else if world.show_input_popup {
+            popup.text = "Enter your name (8 char max)";
+            popup.style = PopupStyle::INFO
+        } else if world.show_ach_popup {
+            popup.text = "You can see the bugs found in Achievements";
+            popup.style = PopupStyle::INFO
+        } else {
+            popup.visible = false;
+        }
+
+        popup.draw(&mut world);
 
         world.glitch_effect.run();
 
