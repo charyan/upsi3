@@ -26,7 +26,7 @@ impl Achievements {
                     "Regain full health by underflowing HP",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
+                    include_bytes!("../assets/images/overhealed.png"),
                     "over_healed",
                     "Go back to zero health by regeneration",
                 ),
