@@ -40,11 +40,14 @@ pub struct World {
     pub show_tutorial_2: bool,
     pub show_tutorial_3: bool,
     pub show_tutorial_4: bool,
-    pub show_warning_popup: bool,
-    pub show_error_popup: bool,
-    pub show_ach_popup: bool,
+    pub show_tutorial_2_1: bool,
+    pub show_tutorial_2_2: bool,
+    pub show_tutorial_2_3: bool,
+    pub show_tutorial_2_4: bool,
+    pub show_tutorial_2_5: bool,
+    pub show_tutorial_2_6: bool,
     pub show_input_popup: bool,
-    pub disable_bug_popup: bool,
+    pub disable_tutorial_2_x: bool,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -73,23 +76,29 @@ impl World {
             show_tutorial_2: false,
             show_tutorial_3: false,
             show_tutorial_4: false,
-            show_warning_popup: false,
-            show_error_popup: false,
-            show_ach_popup: false,
+            show_tutorial_2_1: false,
+            show_tutorial_2_2: false,
+            show_tutorial_2_3: false,
+            show_tutorial_2_4: false,
+            show_tutorial_2_5: false,
+            show_tutorial_2_6: false,
             show_input_popup: false,
-            disable_bug_popup: false,
+            disable_tutorial_2_x: false,
         }
     }
 
     pub fn popup_shown(&self) -> bool {
         self.show_input_popup
-            || self.show_error_popup
-            || self.show_warning_popup
+            || self.show_tutorial_2_2
+            || self.show_tutorial_2_1
             || self.show_tutorial_1
             || self.show_tutorial_2
             || self.show_tutorial_3
             || self.show_tutorial_4
-            || self.show_ach_popup
+            || self.show_tutorial_2_3
+            || self.show_tutorial_2_4
+            || self.show_tutorial_2_5
+            || self.show_tutorial_2_6
     }
 
     pub fn raise_unstability(&mut self, resources: &Resources) {
@@ -381,9 +390,9 @@ impl World {
         play_sound(resources.bsod_sound, PlaySoundParams::default());
         self.reset();
 
-        if !self.disable_bug_popup {
-            self.disable_bug_popup = true;
-            self.show_warning_popup = true;
+        if !self.disable_tutorial_2_x {
+            self.disable_tutorial_2_x = true;
+            self.show_tutorial_2_1 = true;
         }
     }
 

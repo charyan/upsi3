@@ -208,14 +208,23 @@ impl Popup {
                     world.show_tutorial_4 = true;
                 } else if world.show_tutorial_4 {
                     world.show_tutorial_4 = false;
-                } else if world.show_warning_popup {
-                    world.show_warning_popup = false;
-                    world.show_error_popup = true;
-                } else if world.show_error_popup {
-                    world.show_error_popup = false;
-                    world.show_ach_popup = true;
-                } else if world.show_ach_popup {
-                    world.show_ach_popup = false;
+                } else if world.show_tutorial_2_1 {
+                    world.show_tutorial_2_1 = false;
+                    world.show_tutorial_2_2 = true;
+                } else if world.show_tutorial_2_2 {
+                    world.show_tutorial_2_2 = false;
+                    world.show_tutorial_2_3 = true;
+                } else if world.show_tutorial_2_3 {
+                    world.show_tutorial_2_3 = false;
+                    world.show_tutorial_2_4 = true;
+                } else if world.show_tutorial_2_4 {
+                    world.show_tutorial_2_4 = false;
+                    world.show_tutorial_2_5 = true;
+                } else if world.show_tutorial_2_5 {
+                    world.show_tutorial_2_5 = false;
+                    world.show_tutorial_2_6 = true;
+                } else if world.show_tutorial_2_6 {
+                    world.show_tutorial_2_6 = false;
                 } else if world.show_input_popup {
                     world.show_input_popup = false
                 }
@@ -770,22 +779,31 @@ async fn main() {
         } else if world.show_tutorial_4 {
             popup.text = "Use special ability with [SPACE]";
             popup.style = PopupStyle::ERROR
-        } else if world.show_warning_popup {
+        } else if world.show_tutorial_2_1 {
             if game_state == GameState::BSOD {
                 popup.visible = false;
             }
 
             popup.text = "This game doesn't have any bugs !";
             popup.style = PopupStyle::WARNING
-        } else if world.show_error_popup {
+        } else if world.show_tutorial_2_2 {
             popup.text = "Try to find all bugs anyway !";
             popup.style = PopupStyle::ERROR
         } else if world.show_input_popup {
             popup.text = "Enter your name (8 char max)";
             popup.style = PopupStyle::INFO
-        } else if world.show_ach_popup {
+        } else if world.show_tutorial_2_3 {
             popup.text = "You can see the bugs found in Achievements";
+            popup.style = PopupStyle::WARNING
+        } else if world.show_tutorial_2_4 {
+            popup.text = "Once found, bugs will not crash the computer";
             popup.style = PopupStyle::INFO
+        } else if world.show_tutorial_2_5 {
+            popup.text = "You can use them to your advantage";
+            popup.style = PopupStyle::INFO
+        } else if world.show_tutorial_2_6 {
+            popup.text = "But, they WILL cause instability !";
+            popup.style = PopupStyle::WARNING
         } else {
             popup.visible = false;
         }
