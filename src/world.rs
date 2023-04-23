@@ -47,9 +47,13 @@ pub struct World {
     pub show_tutorial_2_4: bool,
     pub show_tutorial_2_5: bool,
     pub show_tutorial_2_6: bool,
+    pub show_credits_1: bool,
+    pub show_credits_2: bool,
     pub show_input_popup: bool,
     pub disable_tutorial_2_x: bool,
     pub timer: f32,
+    pub show_credits: bool,
+    pub show_final_bsod: bool,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -85,9 +89,13 @@ impl World {
             show_tutorial_2_4: false,
             show_tutorial_2_5: false,
             show_tutorial_2_6: false,
+            show_credits_1: false,
+            show_credits_2: false,
             show_input_popup: false,
             disable_tutorial_2_x: false,
             timer: 0.,
+            show_credits: false,
+            show_final_bsod: false,
         }
     }
 
@@ -104,6 +112,8 @@ impl World {
             || self.show_tutorial_2_4
             || self.show_tutorial_2_5
             || self.show_tutorial_2_6
+            || self.show_credits_1
+            || self.show_credits_2
     }
 
     pub fn raise_unstability(&mut self, resources: &Resources) {
@@ -402,6 +412,16 @@ impl World {
             self.disable_tutorial_2_x = true;
             self.show_tutorial_2_1 = true;
         }
+
+        let mut end = true;
+
+        for ach in self.achievements.achievements.clone() {
+            if !ach.unlocked {
+                end = false;
+            }
+        }
+
+        self.show_credits = end;
     }
 
     pub fn power_destroy(

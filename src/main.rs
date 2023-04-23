@@ -134,7 +134,7 @@ impl Popup {
         }
     }
 
-    pub fn draw(&mut self, world: &mut World) {
+    pub fn draw(&mut self, world: &mut World, game_state: &mut GameState, resources: &Resources) {
         if self.visible {
             draw_rectangle(
                 0.,
@@ -237,6 +237,13 @@ impl Popup {
                     world.show_tutorial_2_6 = false;
                 } else if world.show_input_popup {
                     world.show_input_popup = false;
+                } else if world.show_credits_1 {
+                    world.show_credits_1 = false;
+                    world.show_credits_2 = true;
+                } else if world.show_credits_2 {
+                    world.show_credits_2 = false;
+                    world.show_final_bsod = true;
+                    world.bsod(game_state, &resources);
                 }
             }
         }
@@ -789,8 +796,12 @@ async fn main() {
 
                 draw_bsod_text(&bsod_message);
 
-                if is_key_pressed(KeyCode::Enter) {
+                if is_key_pressed(KeyCode::Enter) && !world.show_final_bsod {
                     game_state = GameState::Desktop;
+
+                    if world.show_credits {
+                        world.show_credits_1 = true;
+                    }
                 }
             }
         }
@@ -837,11 +848,17 @@ async fn main() {
         } else if world.show_tutorial_2_6 {
             popup.text = "But, they WILL cause instability !";
             popup.style = PopupStyle::WARNING;
+        } else if world.show_credits_1 {
+            popup.text = "Congratulations, you found all the bugs!";
+            popup.style = PopupStyle::INFO;
+        } else if world.show_credits_2 {
+            popup.text = "Or did you ?";
+            popup.style = PopupStyle::WARNING;
         } else {
             popup.visible = false;
         }
 
-        popup.draw(&mut world);
+        popup.draw(&mut world, &mut game_state, &resources);
 
         world.glitch_effect.run();
 
@@ -857,7 +874,21 @@ async fn main() {
             stop_sound(resources.music);
         }
 
+        if is_key_pressed(KeyCode::Space) {
+            world.disable_tutorial_2_x = true;
+
+            for ach in &mut world.achievements.achievements {
+                ach.unlock();
+            }
+        }
+
         last_game_state = game_state.clone();
+
+        if world.show_final_bsod {
+            world.glitch_effect.set(20, 0.5);
+            // game_state = GameState::BSOD;
+            bsod_message = "Thanks for playing".to_string();
+        }
 
         next_frame().await;
     }
