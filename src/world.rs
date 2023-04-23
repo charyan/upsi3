@@ -40,6 +40,7 @@ pub struct World {
     pub show_tutorial_2: bool,
     pub show_tutorial_3: bool,
     pub show_tutorial_4: bool,
+    pub show_tutorial_5: bool,
     pub show_tutorial_2_1: bool,
     pub show_tutorial_2_2: bool,
     pub show_tutorial_2_3: bool,
@@ -76,6 +77,7 @@ impl World {
             show_tutorial_2: false,
             show_tutorial_3: false,
             show_tutorial_4: false,
+            show_tutorial_5: false,
             show_tutorial_2_1: false,
             show_tutorial_2_2: false,
             show_tutorial_2_3: false,
@@ -95,6 +97,7 @@ impl World {
             || self.show_tutorial_2
             || self.show_tutorial_3
             || self.show_tutorial_4
+            || self.show_tutorial_5
             || self.show_tutorial_2_3
             || self.show_tutorial_2_4
             || self.show_tutorial_2_5

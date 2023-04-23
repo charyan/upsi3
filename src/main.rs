@@ -208,6 +208,9 @@ impl Popup {
                     world.show_tutorial_4 = true;
                 } else if world.show_tutorial_4 {
                     world.show_tutorial_4 = false;
+                    world.show_tutorial_5 = true;
+                } else if world.show_tutorial_5 {
+                    world.show_tutorial_5 = false;
                 } else if world.show_tutorial_2_1 {
                     world.show_tutorial_2_1 = false;
                     world.show_tutorial_2_2 = true;
@@ -775,6 +778,9 @@ async fn main() {
         } else if world.show_tutorial_4 {
             popup.text = "Use special ability with [SPACE]";
             popup.style = PopupStyle::ERROR
+        } else if world.show_tutorial_5 {
+            popup.text = "Use headphones for a better experience";
+            popup.style = PopupStyle::INFO
         } else if world.show_tutorial_2_1 {
             if game_state == GameState::BSOD {
                 popup.visible = false;
