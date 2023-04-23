@@ -6,7 +6,7 @@ use crate::{
 };
 
 use macroquad::{
-    audio::{play_sound, PlaySoundParams},
+    audio::{play_sound, stop_sound, PlaySoundParams},
     prelude::*,
 };
 
@@ -405,6 +405,7 @@ impl World {
         self.glitch_effect.set(20, 2.);
 
         *game_state = GameState::BSOD;
+        stop_sound(resources.or_did_you);
         play_sound(resources.bsod_sound, PlaySoundParams::default());
         self.reset();
 
