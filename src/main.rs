@@ -686,6 +686,7 @@ async fn main() {
                             world.achievements.achievements[0].unlock();
                             bsod_message = world.achievements.achievements[0].name.to_string();
                             game_state = GameState::BSOD;
+                            play_sound(resources.bsod_sound, PlaySoundParams::default());
                         }
                     }
                 }
