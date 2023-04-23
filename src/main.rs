@@ -236,7 +236,12 @@ impl Popup {
     }
 }
 
-fn window_decorations(state: &mut GameState, cross: &mut UIElement, title: &str) {
+fn window_decorations(
+    state: &mut GameState,
+    cross: &mut UIElement,
+    title: &str,
+    world: &mut World,
+) {
     draw_rectangle(0., 0., screen_width(), TITLE_BAR_HEIGHT, LIGHTGRAY);
     cross.position = vec2(screen_width() - 5. - 50., 5.);
     cross.draw();
@@ -249,9 +254,12 @@ fn window_decorations(state: &mut GameState, cross: &mut UIElement, title: &str)
         BLACK,
     );
 
-    let (mouse_x, mouse_y) = mouse_position();
-    if is_mouse_button_pressed(MouseButton::Left) && cross.collide(Vec2::new(mouse_x, mouse_y)) {
-        *state = GameState::Desktop;
+    if !world.popup_shown() {
+        let (mouse_x, mouse_y) = mouse_position();
+        if is_mouse_button_pressed(MouseButton::Left) && cross.collide(Vec2::new(mouse_x, mouse_y))
+        {
+            *state = GameState::Desktop;
+        }
     }
 }
 
@@ -736,7 +744,7 @@ async fn main() {
                     // root_ui().close_current_window();
                 }
 
-                window_decorations(&mut game_state, &mut cross, "Unglitched");
+                window_decorations(&mut game_state, &mut cross, "Unglitched", &mut world);
             }
 
             GameState::Achievements => {
@@ -750,7 +758,7 @@ async fn main() {
                     ach_y += 50.;
                 }
 
-                window_decorations(&mut game_state, &mut cross, "Achievements");
+                window_decorations(&mut game_state, &mut cross, "Achievements", &mut world);
             }
 
             GameState::BSOD => {
