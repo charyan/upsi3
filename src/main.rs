@@ -696,10 +696,6 @@ async fn main() {
                 if world.has_game_started {
                     world.tick(&resources, &mut game_state, &mut bsod_message);
                     draw_game(&world, &resources);
-
-                    if is_key_down(KeyCode::C) {
-                        game_state = GameState::BSOD;
-                    }
                 } else {
                     popup.style = PopupStyle::INFO;
 
