@@ -27,7 +27,7 @@ pub struct Entity {
     pub hit_anim: u32,
 }
 
-const SPAWN_DIST: f32 = 42.;
+const SPAWN_DIST: f32 = 30.;
 const BULLET_SPEED: f32 = 0.25;
 const FOLLOWER_ACCELERATION: f32 = 0.01;
 const PATHER_SPEED: f32 = 0.25;
@@ -38,7 +38,7 @@ pub const CENTER: Vec2 = Vec2::new(WORLD_WIDTH / 2., WORLD_HEIGHT / 2.);
 fn random_outside_pos() -> Vec2 {
     let angle = rand::gen_range(0., TAU);
 
-    Vec2::from_angle(angle) * SPAWN_DIST
+    Vec2::from_angle(angle) * SPAWN_DIST + CENTER
 }
 
 fn random_inside_pos() -> Vec2 {
@@ -178,7 +178,7 @@ impl Entity {
     }
 
     fn bullet_tick(&mut self) {
-        if self.pos.length() > SPAWN_DIST + 1. {
+        if (self.pos - CENTER).length() > SPAWN_DIST + 1. {
             self.alive = false;
         }
         self.pos += self.speed;
