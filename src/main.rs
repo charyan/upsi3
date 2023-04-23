@@ -5,7 +5,6 @@ pub mod entities;
 pub mod resources;
 pub mod world;
 
-use std::sync::Arc;
 use std::{f32::consts::PI, u8};
 
 use entities::{EntityType, WORLD_WIDTH};
@@ -740,7 +739,7 @@ async fn main() {
 
                 for ach in &mut cl_ach.achievements {
                     ach.draw(vec2(ach_x, ach_y));
-                    ach_y += ach.texture.height() + 5.;
+                    ach_y += 50.;
                 }
 
                 window_decorations(&mut game_state, &mut cross, "Achievements");

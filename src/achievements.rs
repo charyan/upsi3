@@ -11,37 +11,37 @@ impl Achievements {
         Self {
             achievements: vec![
                 Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
+                    include_bytes!("../assets/images/name_overflow.png"),
                     "name_overflow",
                     "Crash the game by choosing a big name",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
+                    include_bytes!("../assets/images/unstable.png"),
                     "unstable",
                     "Crash the game by unstability",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
+                    include_bytes!("../assets/images/second_chance.png"),
                     "second_chance",
                     "Regain full health by underflowing HP",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/images/overhealed.png"),
+                    include_bytes!("../assets/images/over_healed.png"),
                     "over_healed",
                     "Go back to zero health by regeneration",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
+                    include_bytes!("../assets/images/unlimited_power.png"),
                     "unlimited_power",
                     "Use the special ability without having any energy for it",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
+                    include_bytes!("../assets/images/over_9000.png"),
                     "over_9000",
-                    "Overflow your energy back to zero by regeneration too much",
+                    "Overflow your energy back to zero by taking too much",
                 ),
                 Achievement::new(
-                    include_bytes!("../assets/images/ach_unknown.png"),
+                    include_bytes!("../assets/images/up.png"),
                     "up",
                     "Leave the map",
                 ),
