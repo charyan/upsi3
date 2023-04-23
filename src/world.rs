@@ -285,7 +285,6 @@ impl World {
 
         if display_bsod {
             self.bsod(game_state, resources);
-            self.glitch_effect.set(20, 2.)
         }
 
         if self.glitch_frequency_counter == 0 {
@@ -389,6 +388,8 @@ impl World {
     }
 
     pub fn bsod(&mut self, game_state: &mut GameState, resources: &Resources) {
+        self.glitch_effect.set(20, 2.);
+
         *game_state = GameState::BSOD;
         play_sound(resources.bsod_sound, PlaySoundParams::default());
         self.reset();
