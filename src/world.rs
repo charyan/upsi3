@@ -89,7 +89,7 @@ impl World {
         }
     }
 
-    pub fn popup_shown(&self) -> bool {
+    pub const fn popup_shown(&self) -> bool {
         self.show_input_popup
             || self.show_tutorial_2_2
             || self.show_tutorial_2_1
@@ -186,12 +186,12 @@ impl World {
                         self.hp = new_hp;
                     } else {
                         self.hp = 3;
-                        if self.achievements.achievements[2].unlocked == false {
+                        if self.achievements.achievements[2].unlocked {
+                            to_raise_unstability = true;
+                        } else {
                             self.achievements.achievements[2].unlock();
                             *bsod_message = self.achievements.achievements[2].name.to_owned();
                             display_bsod = true;
-                        } else {
-                            to_raise_unstability = true;
                         }
                     }
                     self.player.hit_anim = 10;
@@ -258,15 +258,14 @@ impl World {
 
         self.enemies.retain(|e| {
             if !e.alive {
-                match e.e_type {
-                    EntityType::Follower => {
-                        if rand::gen_range(0., 100.) < 12.5 {
-                            self.items.push(Entity::new_heal_item());
-                        } else if rand::gen_range(0., 100.) < 12.5 {
-                            self.items.push(Entity::new_mana_item());
-                        }
+                if let EntityType::Follower = e.e_type {
+                    let rand_num = rand::gen_range(0., 100.);
+
+                    if rand_num < 12.5 {
+                        self.items.push(Entity::new_heal_item());
+                    } else if rand_num < 25. {
+                        self.items.push(Entity::new_mana_item());
                     }
-                    _ => (),
                 }
             }
             e.alive
@@ -280,7 +279,7 @@ impl World {
         }
 
         if to_raise_unstability {
-            self.raise_unstability(&resources);
+            self.raise_unstability(resources);
         }
 
         if display_bsod {
@@ -291,7 +290,7 @@ impl World {
             match self.instability {
                 1 => {
                     self.initialize_glitch(0.01);
-                    self.glitch_effect.set(20, 0.5)
+                    self.glitch_effect.set(20, 0.5);
                 }
                 2 => {
                     self.initialize_glitch(0.05);
@@ -307,7 +306,7 @@ impl World {
                 }
                 5 => {
                     self.initialize_glitch(1.);
-                    self.glitch_effect.set(20, 8.)
+                    self.glitch_effect.set(20, 8.);
                 }
                 _ => (),
             }
@@ -436,7 +435,7 @@ impl World {
                 *bsod_message = self.achievements.achievements[4].name.to_owned();
                 // *game_state = GameState::BSOD;
                 // play_sound(resources.bsod_sound, PlaySoundParams::default());
-                self.bsod(game_state, &resources);
+                self.bsod(game_state, resources);
             }
         }
     }

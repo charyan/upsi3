@@ -62,7 +62,7 @@ impl Achievement {
     pub fn new(bytes: &[u8], name: &'static str, desc: &'static str) -> Self {
         let texture = Texture2D::from_file_with_format(bytes, None);
         texture.set_filter(FilterMode::Nearest);
-        Achievement {
+        Self {
             texture,
             name,
             desc,

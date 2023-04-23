@@ -1,4 +1,4 @@
-use macroquad::audio::*;
+use macroquad::audio::{load_sound_from_bytes, Sound};
 use macroquad::prelude::*;
 
 pub struct Resources {
@@ -91,7 +91,7 @@ impl Resources {
             .await
             .unwrap();
 
-        Resources {
+        Self {
             player,
             player_hit,
             power_up,

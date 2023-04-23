@@ -1,4 +1,13 @@
 #![warn(clippy::pedantic, clippy::nursery)]
+#![allow(
+    clippy::future_not_send,
+    clippy::too_many_lines,
+    clippy::cognitive_complexity,
+    clippy::cast_precision_loss,
+    clippy::cast_lossless,
+    clippy::cast_sign_loss,
+    clippy::cast_possible_truncation
+)]
 
 pub mod achievements;
 pub mod entities;
@@ -39,7 +48,7 @@ impl UIElement {
     pub fn new(position: Vec2, draw_dst: Vec2, bytes: &[u8]) -> Self {
         let t = Texture2D::from_file_with_format(bytes, None);
         t.set_filter(FilterMode::Nearest);
-        UIElement {
+        Self {
             texture: t,
             position,
             draw_dst,
@@ -81,7 +90,6 @@ impl UIElement {
 }
 
 #[derive(Clone)]
-
 pub enum PopupStyle {
     INFO,
     WARNING,
@@ -175,8 +183,7 @@ impl Popup {
                 self.position.y + TITLE_BAR_HEIGHT / 2. + 5.,
                 40.,
                 match self.style {
-                    PopupStyle::ERROR => WHITE,
-                    PopupStyle::INFO => WHITE,
+                    PopupStyle::ERROR | PopupStyle::INFO => WHITE,
                     PopupStyle::WARNING => BLACK,
                 },
             );
@@ -229,7 +236,7 @@ impl Popup {
                 } else if world.show_tutorial_2_6 {
                     world.show_tutorial_2_6 = false;
                 } else if world.show_input_popup {
-                    world.show_input_popup = false
+                    world.show_input_popup = false;
                 }
             }
         }
@@ -461,9 +468,9 @@ pub fn update_texture_screen_foo_bar(texture: &mut Texture2D) {
 }
 
 impl GlitchEffect {
-    pub fn new() -> GlitchEffect {
+    pub fn new() -> Self {
         let context = unsafe { get_internal_gl().quad_context };
-        GlitchEffect {
+        Self {
             count: 0,
             intensity_multiplicator: 1.,
             texture: Texture2D::from_miniquad_texture(miniquad::Texture::new_render_texture(
@@ -780,41 +787,41 @@ async fn main() {
             popup.style = PopupStyle::INFO;
         } else if world.show_tutorial_2 {
             popup.text = "Play our best game \"Unglitched\" !";
-            popup.style = PopupStyle::WARNING
+            popup.style = PopupStyle::WARNING;
         } else if world.show_tutorial_3 {
             popup.text = "MOVE with W A S D";
-            popup.style = PopupStyle::WARNING
+            popup.style = PopupStyle::WARNING;
         } else if world.show_tutorial_4 {
             popup.text = "Use special ability with [SPACE]";
-            popup.style = PopupStyle::ERROR
+            popup.style = PopupStyle::ERROR;
         } else if world.show_tutorial_5 {
             popup.text = "Use headphones for a better experience";
-            popup.style = PopupStyle::INFO
+            popup.style = PopupStyle::INFO;
         } else if world.show_tutorial_2_1 {
             if game_state == GameState::BSOD {
                 popup.visible = false;
             }
 
             popup.text = "This game doesn't have any bugs !";
-            popup.style = PopupStyle::WARNING
+            popup.style = PopupStyle::WARNING;
         } else if world.show_tutorial_2_2 {
             popup.text = "Try to find all bugs anyway !";
-            popup.style = PopupStyle::ERROR
+            popup.style = PopupStyle::ERROR;
         } else if world.show_input_popup {
             popup.text = "Enter your name (8 char max)";
-            popup.style = PopupStyle::INFO
+            popup.style = PopupStyle::INFO;
         } else if world.show_tutorial_2_3 {
             popup.text = "You can see the bugs found in Achievements";
-            popup.style = PopupStyle::WARNING
+            popup.style = PopupStyle::WARNING;
         } else if world.show_tutorial_2_4 {
             popup.text = "Once found, bugs will not crash the computer";
-            popup.style = PopupStyle::INFO
+            popup.style = PopupStyle::INFO;
         } else if world.show_tutorial_2_5 {
             popup.text = "You can use them to your advantage";
-            popup.style = PopupStyle::INFO
+            popup.style = PopupStyle::INFO;
         } else if world.show_tutorial_2_6 {
             popup.text = "But, they WILL cause instability !";
-            popup.style = PopupStyle::WARNING
+            popup.style = PopupStyle::WARNING;
         } else {
             popup.visible = false;
         }
