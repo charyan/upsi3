@@ -49,6 +49,7 @@ pub struct World {
     pub show_tutorial_2_6: bool,
     pub show_input_popup: bool,
     pub disable_tutorial_2_x: bool,
+    pub timer: f32,
 }
 
 const PLAYER_SPEED: f32 = 0.05;
@@ -86,6 +87,7 @@ impl World {
             show_tutorial_2_6: false,
             show_input_popup: false,
             disable_tutorial_2_x: false,
+            timer: 0.,
         }
     }
 
@@ -121,6 +123,8 @@ impl World {
         game_state: &mut GameState,
         bsod_message: &mut String,
     ) {
+        self.timer += 1. / 60.;
+
         if self.power_up_timer > 0 {
             self.power_up_timer -= 1;
         }
@@ -384,6 +388,7 @@ impl World {
         self.follower_spawn_timer = 0;
         self.enemies.clear();
         self.items.clear();
+        self.timer = 0.;
     }
 
     pub fn bsod(&mut self, game_state: &mut GameState, resources: &Resources) {

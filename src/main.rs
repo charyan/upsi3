@@ -454,6 +454,14 @@ fn draw_ui(texture: Texture2D, mut pos: Vec2, mut radius: f32, screen_width: f32
     );
 }
 
+fn draw_ui_text(text: &str, mut pos: Vec2, size: f32, screen_width: f32) {
+    let scale = screen_width / WORLD_WIDTH;
+
+    pos *= scale;
+
+    draw_text(text, pos.x, pos.y, size * scale, WHITE);
+}
+
 pub struct GlitchEffect {
     count: u32,
     intensity_multiplicator: f32,
@@ -626,6 +634,13 @@ fn draw_game(world: &World, resources: &Resources) {
             0.,
         );
     }
+
+    draw_ui_text(
+        &format!("{}", world.timer as u32),
+        Vec2::new(1., 29.),
+        1.5,
+        screen_width(),
+    );
 }
 
 #[macroquad::main("Unglitched")]

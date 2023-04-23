@@ -27,6 +27,7 @@ pub struct Resources {
     pub picking_item_sound: Sound,
 
     pub music: Sound,
+    pub or_did_you: Sound,
 }
 
 fn new_texture(bytes: &[u8]) -> Texture2D {
@@ -91,6 +92,10 @@ impl Resources {
             .await
             .unwrap();
 
+        let or_did_you = load_sound_from_bytes(include_bytes!("../assets/sounds/or_did_you.wav"))
+            .await
+            .unwrap();
+
         Self {
             player,
             player_hit,
@@ -112,6 +117,7 @@ impl Resources {
             picking_item_sound,
             glitch_sound,
             music,
+            or_did_you,
         }
     }
 }
