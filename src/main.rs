@@ -662,12 +662,7 @@ async fn main() {
 
             GameState::Game => {
                 if world.has_game_started {
-                    world.tick(
-                        &resources,
-                        &mut game_state,
-                        &mut bsod_message,
-                        &mut last_game_state,
-                    );
+                    world.tick(&resources, &mut game_state, &mut bsod_message);
                     draw_game(&world, &resources);
 
                     if is_key_down(KeyCode::C) {
@@ -682,7 +677,7 @@ async fn main() {
 
                         if input_text.len() > 8 {
                             if world.achievements.achievements[0].unlocked {
-                                world.raise_unstability();
+                                world.raise_unstability(&resources);
                             } else {
                                 world.achievements.achievements[0].unlock();
                                 bsod_message = world.achievements.achievements[0].name.to_string();

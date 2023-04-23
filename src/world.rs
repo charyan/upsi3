@@ -2,7 +2,7 @@ use crate::{
     achievements,
     entities::{self, Entity, EntityType, WORLD_HEIGHT, WORLD_WIDTH},
     resources::{self, Resources},
-    GameState, GlitchEffect, Popup, PopupStyle,
+    GameState, GlitchEffect,
 };
 
 use macroquad::{
@@ -63,8 +63,15 @@ impl World {
         }
     }
 
-    pub fn raise_unstability(&mut self) {
+    pub fn raise_unstability(&mut self, resources: &Resources) {
         self.instability += INSTABILITY_UP;
+        play_sound(
+            resources.small_bug_sound,
+            PlaySoundParams {
+                looped: false,
+                volume: 1.,
+            },
+        );
     }
 
     pub fn tick(
@@ -72,7 +79,6 @@ impl World {
         resources: &Resources,
         game_state: &mut GameState,
         bsod_message: &mut String,
-        last_game_state: &mut GameState,
     ) {
         if self.power_up_timer > 0 {
             self.power_up_timer -= 1;
@@ -233,7 +239,7 @@ impl World {
         }
 
         if to_raise_unstability {
-            self.raise_unstability();
+            self.raise_unstability(&resources);
         }
 
         if display_bsod {
@@ -377,7 +383,7 @@ impl World {
                 self.mana = 2;
             }
             if self.achievements.achievements[4].unlocked {
-                self.raise_unstability();
+                self.raise_unstability(resources);
             } else {
                 self.achievements.achievements[4].unlock();
                 *bsod_message = self.achievements.achievements[4].name.to_owned();

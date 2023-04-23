@@ -75,7 +75,7 @@ impl Achievement {
     }
 
     pub fn draw(&self, position: Vec2) {
-        let rect_width = (screen_width() - 100.);
+        let rect_width = screen_width() - 100.;
         let rect_height = 42.;
         let img_width = 32.;
         let img_height = 32.;
